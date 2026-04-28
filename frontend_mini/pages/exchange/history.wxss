@@ -1,0 +1,148 @@
+.container {
+  background-color: #F8FAFC;
+  min-height: 100vh;
+  padding: 16rpx 16rpx var(--space-16);
+}
+
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.record-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: var(--radius-md);
+  box-shadow: 0 4rpx var(--radius-sm) rgba(0, 0, 0, 0.08);
+}
+
+.record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16rpx;
+  margin-bottom: 16rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.record-number {
+  font-size: var(--radius-md);
+  color: var(--gray-400);
+}
+
+.record-status {
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  color: #fff;
+}
+
+.status-pending {
+  background-color: #faad14;
+}
+
+.status-completed {
+  background-color: #10b981;
+}
+
+.status-failed {
+  background-color: #ef4444;
+}
+
+.record-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.label {
+  font-size: var(--radius-md);
+  color: var(--gray-400);
+}
+
+.value {
+  font-size: 26rpx;
+  color: var(--gray-700);
+  text-align: right;
+  word-break: break-all;
+}
+
+.batteries {
+  align-items: stretch;
+}
+
+.battery-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.align-right {
+  align-items: flex-end;
+}
+
+.swap-arrow {
+  font-size: var(--space-16);
+  color: #14b8a6;
+  align-self: center;
+}
+
+.emphasis {
+  color: #0f766e;
+  font-weight: 600;
+}
+
+.fee {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 140rpx 0;
+}
+
+.empty-icon {
+  font-size: 112rpx;
+  margin-bottom: var(--radius-md);
+}
+
+.empty-text {
+  font-size: var(--text-base);
+  color: var(--gray-400);
+  margin-bottom: var(--space-16);
+}
+
+.empty-btn {
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+  color: #fff;
+  border-radius: 999rpx;
+  padding: 0 48rpx;
+  font-size: var(--text-base);
+}
+
+.loading,
+.no-more {
+  text-align: center;
+  padding: var(--space-16) 0;
+}
+
+.loading-text,
+.no-more-text {
+  font-size: var(--radius-md);
+  color: var(--gray-400);
+}
+
+

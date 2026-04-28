@@ -1,0 +1,250 @@
+/* 电池预约列表页面 - 高效工业风 */
+.reservation-list-page {
+  min-height: 100vh;
+  background: #1A1A1A;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 标签切换 */
+.tabs {
+  display: flex;
+  background: #242424;
+  padding: 0 var(--space-16);
+  border-bottom: 2rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-item {
+  position: relative;
+  flex: 1;
+  padding: var(--space-16) 0;
+  text-align: center;
+}
+
+.tab-label {
+  font-size: var(--space-16);
+  color: #8C8C8C;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.tab-item.active .tab-label {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 6rpx;
+  background: linear-gradient(90deg, var(--success) 0%, #00CC6F 100%);
+  border-radius: 3rpx;
+  box-shadow: 0 0 10rpx rgba(0, 255, 136, 0.5);
+}
+
+/* 预约列表 */
+.reservation-list {
+  flex: 1;
+  padding: var(--radius-md) var(--space-16);
+}
+
+.reservation-item {
+  position: relative;
+  padding: var(--space-16);
+  background: #242424;
+  border-radius: var(--radius-md);
+  border: 2rpx solid rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--radius-md);
+}
+
+/* 状态标签 */
+.status-badge {
+  position: absolute;
+  top: var(--space-16);
+  right: var(--space-16);
+  padding: 8rpx var(--radius-md);
+  border-radius: var(--radius-md);
+  font-size: var(--radius-md);
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: rgba(0, 255, 136, 0.2);
+  color: var(--success);
+}
+
+.status-badge.completed {
+  background: rgba(0, 255, 136, 0.1);
+  color: var(--success);
+}
+
+.status-badge.cancelled,
+.status-badge.expired {
+  background: rgba(140, 140, 140, 0.2);
+  color: #8C8C8C;
+}
+
+/* 站点信息 */
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--radius-md);
+  padding-right: 112rpx;
+}
+
+.station-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.station-distance {
+  font-size: var(--text-base);
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* 电池信息 */
+.battery-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--radius-md) 0;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+  margin-bottom: var(--radius-md);
+}
+
+.battery-code {
+  font-size: var(--space-16);
+  font-weight: 600;
+  color: var(--success);
+  font-family: 'SF Mono', monospace;
+}
+
+.battery-charge {
+  display: flex;
+  align-items: center;
+  gap: var(--radius-sm);
+}
+
+.charge-text {
+  font-size: var(--text-base);
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* 时间信息 */
+.time-info {
+  margin-bottom: var(--radius-md);
+}
+
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--radius-sm) 0;
+}
+
+.time-label {
+  font-size: 26rpx;
+  color: #8C8C8C;
+}
+
+.time-value {
+  font-size: 26rpx;
+  color: #FFFFFF;
+  font-family: 'SF Mono', monospace;
+}
+
+.time-value.highlight {
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* 倒计时 */
+.countdown-wrapper {
+  padding: var(--radius-md);
+  background: rgba(0, 255, 136, 0.05);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--radius-md);
+}
+
+/* 操作按钮 */
+.item-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 82rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.cancel {
+  background: #ffffff;
+  color: var(--gray-600);
+  border: 2rpx solid var(--gray-200);
+}
+
+.action-btn.primary {
+  background: var(--brand-gradient);
+  color: #ffffff;
+  box-shadow: 0 8rpx 22rpx rgba(20, 184, 166, 0.24);
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 112rpx 0;
+}
+
+.empty-icon {
+  font-size: 112rpx;
+  margin-bottom: var(--radius-md);
+  opacity: 0.3;
+}
+
+.empty-text {
+  font-size: var(--space-16);
+  color: #8C8C8C;
+  margin-bottom: 48rpx;
+}
+
+.empty-btn {
+  min-width: 336rpx;
+  height: 92rpx;
+  background: var(--brand-gradient);
+  border-radius: 999rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10rpx 26rpx rgba(20, 184, 166, 0.24);
+}
+
+/* 加载状态 */
+.loading-more,
+.no-more {
+  text-align: center;
+  padding: 40rpx 0;
+  font-size: var(--text-base);
+  color: #8C8C8C;
+}
+
+

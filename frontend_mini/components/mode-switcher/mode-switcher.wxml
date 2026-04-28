@@ -1,0 +1,22 @@
+<!-- 模式切换器组件 -->
+<view class="mode-switcher">
+  <view class="switcher-container">
+    <view
+      class="mode-item {{currentMode === 'normal' ? 'active' : ''}}"
+      bindtap="onSwitchMode"
+      data-mode="normal"
+    >
+      <text class="mode-icon">👤</text>
+      <text class="mode-label">普通模式</text>
+    </view>
+
+    <view
+      class="mode-item {{currentMode === 'delivery' ? 'active' : ''}}"
+      bindtap="onSwitchMode"
+      data-mode="delivery"
+    >
+      <text class="mode-icon">⚡</text>
+      <text class="mode-label">送单模式</text>
+    </view>
+  </view>
+</view>

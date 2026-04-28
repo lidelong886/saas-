@@ -1,0 +1,12 @@
+.container {
+  padding: var(--space-16);
+  min-height: 100vh;
+  background: #F0FDFA;
+  box-sizing: border-box;
+}
+.field { background: #fff; border-radius: var(--radius-md); padding: var(--radius-md); margin-bottom: var(--radius-md); }
+.label { font-size: var(--text-base); color: #333; margin-bottom: 16rpx; display: block; }
+.picker { font-size: var(--text-base); padding: var(--radius-sm) 0; color: #2d8cf0; }
+.sub { font-size: 26rpx; color: #888; margin-bottom: var(--space-16); display: block; }
+
+

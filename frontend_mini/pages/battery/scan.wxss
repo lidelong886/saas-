@@ -1,0 +1,221 @@
+/* pages/battery/scan.wxss */
+.container {
+  background-color: #F8FAFC;
+  min-height: 100vh;
+  padding: var(--space-16) 16rpx;
+}
+
+/* 扫码区域 */
+.scan-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 112rpx 0;
+}
+
+.scan-icon {
+  font-size: 160rpx;
+  margin-bottom: var(--space-16);
+}
+
+.scan-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.scan-desc {
+  font-size: var(--text-base);
+  color: #999;
+  margin-bottom: 48rpx;
+  text-align: center;
+}
+
+.scan-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 44rpx;
+  padding: var(--radius-md) var(--btn-height);
+  font-size: var(--space-16);
+  border: none;
+  box-shadow: 0 8rpx 16rpx rgba(102, 126, 234, 0.4);
+}
+
+/* 电池信息 */
+.battery-section {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--radius-md));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.battery-card {
+  background-color: white;
+  border-radius: var(--radius-sm);
+  padding: var(--space-16);
+  margin-bottom: var(--radius-md);
+  box-shadow: 0 2rpx 8rpx var(--shadow-md);
+}
+
+.battery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--radius-md);
+  padding-bottom: var(--radius-md);
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.battery-title {
+  font-size: var(--space-16);
+  font-weight: bold;
+  color: #333;
+}
+
+.battery-status {
+  padding: 8rpx 16rpx;
+  border-radius: var(--radius-sm);
+  font-size: var(--radius-md);
+  color: white;
+}
+
+.status-available {
+  background-color: #52c41a;
+}
+
+.status-in_use {
+  background-color: #faad14;
+}
+
+.status-charging {
+  background-color: #1890ff;
+}
+
+.status-maintenance {
+  background-color: #ff4d4f;
+}
+
+/* 电池信息行 */
+.battery-info {
+  margin-bottom: var(--radius-md);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F8FAFC;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: var(--text-base);
+  color: #999;
+}
+
+.info-value {
+  font-size: var(--text-base);
+  color: #333;
+  font-weight: 500;
+}
+
+/* 价格信息 */
+.battery-price {
+  display: flex;
+  justify-content: space-around;
+  padding: var(--radius-md) 0;
+  background-color: #F8FAFC;
+  border-radius: var(--radius-sm);
+}
+
+.price-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.price-label {
+  font-size: var(--radius-md);
+  color: #999;
+}
+
+.price-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #ff4d4f;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: var(--radius-md);
+}
+
+.action-btn {
+  flex: 1;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  font-size: var(--space-16);
+  border: none;
+}
+
+.primary-btn {
+  background-color: #07c160;
+  color: white;
+}
+
+.primary-btn[disabled] {
+  background-color: #cccccc;
+  color: #999999;
+}
+
+.secondary-btn {
+  background-color: white;
+  color: #666;
+  border: 1rpx solid #e5e5e5;
+}
+
+/* 提示信息 */
+.tips-section {
+  background-color: #fff7e6;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  border-left: 4rpx solid #faad14;
+}
+
+.tips-title {
+  font-size: var(--text-base);
+  font-weight: bold;
+  color: #fa8c16;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.tips-item {
+  font-size: var(--radius-md);
+  color: #666;
+  display: block;
+  line-height: 40rpx;
+  margin-bottom: 8rpx;
+}
+
+.tips-item:last-child {
+  margin-bottom: 0;
+}
+
+

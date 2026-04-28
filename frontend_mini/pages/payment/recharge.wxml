@@ -1,0 +1,56 @@
+<view class="container">
+  <view class="header">
+    <text class="title">账户充值</text>
+  </view>
+
+  <view class="amount-section">
+    <text class="section-title">选择充值金额</text>
+
+    <view class="preset-amounts">
+      <view
+        class="amount-item {{selectedAmount === item ? 'selected' : ''}}"
+        wx:for="{{presetAmounts}}"
+        wx:key="index"
+        bindtap="onPresetTap"
+        data-amount="{{item}}"
+      >
+        <text class="amount-value">¥{{item}}</text>
+      </view>
+    </view>
+
+    <view class="custom-amount">
+      <text class="custom-label">自定义金额</text>
+      <view class="custom-input-wrapper">
+        <text class="currency">¥</text>
+        <input
+          class="custom-input"
+          type="digit"
+          placeholder="请输入金额"
+          value="{{customAmount}}"
+          bindinput="onCustomInput"
+        />
+      </view>
+    </view>
+  </view>
+
+  <view class="tips">
+    <text class="tip-item">• 最低充值10元，单次最多10000元</text>
+    <text class="tip-item">• 充值金额可用于支付订单和套餐</text>
+    <text class="tip-item">• 充值后不支持提现，请按需充值</text>
+  </view>
+
+  <view class="bottom-bar">
+    <view class="total">
+      <text class="total-label">充值金额</text>
+      <text class="total-amount">¥{{selectedAmount || 0}}</text>
+    </view>
+    <button
+      class="recharge-btn"
+      type="primary"
+      loading="{{loading}}"
+      bindtap="onRecharge"
+    >
+      立即充值
+    </button>
+  </view>
+</view>

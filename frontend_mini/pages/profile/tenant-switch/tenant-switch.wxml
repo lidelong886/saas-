@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="header">
+    <text class="title">切换运营商</text>
+    <text class="subtitle">选择当前使用的换电服务</text>
+  </view>
+
+  <view class="tenant-list" wx:if="{{tenants.length > 0}}">
+    <view
+      class="tenant-item {{currentTenantId === item.id ? 'active' : ''}}"
+      wx:for="{{tenants}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onTenantSwitch"
+    >
+      <text class="tenant-name">{{item.displayName}}</text>
+      <text class="selected-text" wx:if="{{currentTenantId === item.id}}">当前</text>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <text class="empty-text">暂无可切换运营商</text>
+  </view>
+</view>

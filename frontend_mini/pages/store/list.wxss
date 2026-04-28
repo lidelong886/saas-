@@ -1,0 +1,141 @@
+/* pages/store/list.wxss */
+.container {
+  background: #F8FAFC;
+  min-height: 100vh;
+  padding: var(--radius-md);
+}
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--radius-md);
+  padding: 40rpx var(--space-16);
+  margin-bottom: var(--radius-md);
+  color: white;
+}
+
+.title {
+  font-size: 40rpx;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.subtitle {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.battery-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.battery-card {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: var(--radius-md);
+  box-shadow: 0 2rpx var(--radius-sm) rgba(0, 0, 0, 0.08);
+}
+
+.battery-info {
+  margin-bottom: var(--radius-md);
+}
+
+.battery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.battery-model {
+  font-size: var(--space-16);
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.battery-voltage-tag {
+  background: #dbeafe;
+  color: var(--primary-dark);
+  padding: 6rpx 16rpx;
+  border-radius: var(--radius-sm);
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.battery-specs {
+  display: flex;
+  gap: var(--radius-md);
+  margin-bottom: var(--radius-sm);
+}
+
+.spec-item {
+  font-size: 26rpx;
+  color: #6b7280;
+}
+
+.battery-code {
+  font-size: var(--radius-md);
+  color: #9ca3af;
+}
+
+.battery-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--radius-md);
+  border-top: 1rpx solid #f3f4f6;
+}
+
+.price-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-label {
+  font-size: 22rpx;
+  color: #9ca3af;
+  margin-bottom: 4rpx;
+}
+
+.price-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #ef4444;
+}
+
+.buy-btn {
+  background: var(--brand-gradient);
+  color: white;
+  border: none;
+  border-radius: 999rpx;
+  min-height: 82rpx;
+  padding: 0 44rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10rpx 24rpx rgba(20, 184, 166, 0.24);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 112rpx 0;
+}
+
+.empty-icon {
+  font-size: 112rpx;
+  margin-bottom: var(--radius-md);
+}
+
+.empty-text {
+  font-size: var(--text-base);
+  color: #9ca3af;
+}
+
+

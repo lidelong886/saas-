@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="card" wx:if="{{!loading}}">
+    <view class="status-row">
+      <text class="status-label">当前状态</text>
+      <text class="status-value status-{{realnameStatus}}">{{realnameStatus === 'verified' ? '已认证' : (realnameStatus === 'pending' ? '审核中' : (realnameStatus === 'rejected' ? '已拒绝' : '未认证'))}}</text>
+    </view>
+
+    <view class="field">
+      <text class="label">真实姓名</text>
+      <input class="input" value="{{realName}}" placeholder="请输入真实姓名" bindinput="onRealNameInput" />
+    </view>
+
+    <view class="field">
+      <text class="label">身份证号</text>
+      <input class="input" value="{{idCardNo}}" placeholder="请输入身份证号" bindinput="onIdCardInput" />
+    </view>
+
+    <button class="btn" type="primary" loading="{{submitting}}" bindtap="onSubmit">提交认证</button>
+    <text class="tip">用于租电、换电等实名场景。毕设演示模式下提交后进入认证状态；生产环境可对接公安实名核验或人工审核。</text>
+  </view>
+
+  <view class="loading" wx:else>加载中...</view>
+</view>

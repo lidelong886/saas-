@@ -1,0 +1,12 @@
+<view class="container" wx:if="{{battery}}">
+  <view class="card">
+    <text class="title">{{battery.battery_code}}</text>
+    <text class="line">状态：{{battery.status}}</text>
+    <text class="line">电量：{{battery.power_level != null ? battery.power_level + '%' : '-'}}</text>
+    <text class="line">租金：¥{{battery.rental_price_per_hour}}/小时</text>
+    <text class="line">押金：¥{{battery.deposit_amount}}</text>
+  </view>
+  <button type="primary" bindtap="goCreateOrder" wx:if="{{battery.status === 'available'}}">创建租用订单</button>
+  <text class="tip" wx:else>该电池当前不可租</text>
+</view>
+<view class="empty" wx:else>{{loading ? '加载中...' : '未找到电池'}}</view>

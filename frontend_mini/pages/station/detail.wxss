@@ -1,0 +1,429 @@
+/* pages/station/detail.wxss */
+.container {
+  background-color: #F8FAFC;
+  min-height: 100vh;
+  padding: 16rpx;
+}
+
+.station-card {
+  background-color: white;
+  border-radius: var(--radius-sm);
+  padding: var(--space-16);
+  margin-bottom: 16rpx;
+}
+
+.station-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--radius-md);
+  padding-bottom: var(--radius-md);
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.station-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.station-status {
+  padding: 8rpx 16rpx;
+  border-radius: var(--radius-sm);
+  font-size: var(--radius-md);
+  color: white;
+}
+
+.status-active {
+  background-color: #52c41a;
+}
+
+.status-maintenance {
+  background-color: #ff4d4f;
+}
+
+.station-info {
+  margin-bottom: var(--radius-md);
+}
+
+.info-row {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F8FAFC;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: var(--text-base);
+  color: #999;
+  width: 200rpx;
+}
+
+.info-value {
+  flex: 1;
+  font-size: var(--text-base);
+  color: #333;
+}
+
+.navigate-btn {
+  background-color: #07c160;
+  color: white;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  font-size: var(--space-16);
+  border: none;
+}
+
+.link-btn {
+  margin-top: var(--radius-md);
+  background-color: #fff;
+  color: #07c160;
+  border: 1rpx solid #07c160;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  font-size: 30rpx;
+}
+
+.cabinet-section {
+  background-color: white;
+  border-radius: var(--radius-sm);
+  padding: var(--space-16);
+  margin-bottom: 16rpx;
+}
+
+.cabinet-card {
+  background: #f0fdfa;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  margin-bottom: 16rpx;
+  border-left: 6rpx solid #0d9488;
+}
+
+.cabinet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--radius-sm);
+}
+
+.cabinet-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.cabinet-badge {
+  font-size: 22rpx;
+  color: var(--gray-500);
+  background: #fff;
+  padding: 6rpx var(--radius-sm);
+  border-radius: var(--radius-sm);
+}
+
+.cabinet-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--radius-sm);
+  margin-top: 8rpx;
+}
+
+.cabinet-stat {
+  font-size: 26rpx;
+  color: var(--gray-700);
+}
+
+.cabinet-stat.muted {
+  color: var(--gray-400);
+  font-size: var(--radius-md);
+}
+
+.empty-hint {
+  font-size: 26rpx;
+  color: var(--gray-400);
+  line-height: 1.5;
+  padding: 16rpx 0;
+}
+
+.batteries-section {
+  background-color: white;
+  border-radius: var(--radius-sm);
+  padding: var(--space-16);
+}
+
+.section-title {
+  font-size: var(--space-16);
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.battery-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--radius-sm);
+}
+
+.battery-item {
+  background-color: #f8fafc;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md) var(--radius-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.battery-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.battery-code {
+  font-size: var(--text-base);
+  color: var(--gray-900);
+  font-weight: 600;
+}
+
+.battery-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--radius-sm);
+}
+
+.battery-voltage {
+  font-size: 22rpx;
+  color: var(--gray-500);
+  background: var(--gray-100);
+  padding: 4rpx 8rpx;
+  border-radius: 4rpx;
+}
+
+.battery-status {
+  font-size: 22rpx;
+  color: var(--gray-500);
+}
+
+.battery-level {
+  font-size: var(--text-base);
+  color: #0d9488;
+  font-weight: bold;
+}
+
+/* ── 实时电池资源面板 ─────────────────────────────── */
+.resource-panel {
+  background: #f8fafc;
+  border-radius: var(--radius-md);
+  padding: 28rpx;
+  margin-bottom: var(--radius-md);
+}
+.resource-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--gray-900);
+  display: block;
+  margin-bottom: var(--radius-md);
+}
+
+/* 电压类型分类统计 */
+.voltage-stats {
+  margin-bottom: var(--radius-md);
+}
+.voltage-item {
+  background: #fff;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  margin-bottom: var(--radius-sm);
+  border-left: 6rpx solid #0d9488;
+}
+.voltage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--radius-sm);
+}
+.voltage-label {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--gray-900);
+}
+.voltage-count {
+  font-size: 26rpx;
+  color: #0d9488;
+  font-weight: 600;
+}
+.voltage-bar {
+  height: 8rpx;
+  background: var(--gray-200);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+.voltage-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0d9488, #14b8a6);
+  border-radius: 4rpx;
+  transition: width 0.3s;
+}
+
+.resource-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--radius-md);
+}
+.resource-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.resource-stat-num {
+  font-size: 44rpx;
+  font-weight: 800;
+}
+.stat-available .resource-stat-num { color: #10b981; }
+.stat-charging .resource-stat-num { color: #f59e0b; }
+.stat-total .resource-stat-num { color: var(--primary); }
+.resource-stat-label {
+  font-size: 22rpx;
+  color: var(--gray-400);
+  margin-top: 4rpx;
+}
+.resource-bar-container {
+  margin-bottom: var(--radius-sm);
+}
+.resource-bar-full {
+  display: flex;
+  height: 16rpx;
+  background: var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: var(--radius-sm);
+}
+.resource-bar-seg {
+  height: 100%;
+  transition: width 0.3s;
+}
+.seg-available { background: #10b981; }
+.seg-charging { background: #f59e0b; }
+.resource-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--radius-md);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 22rpx;
+  color: var(--gray-500);
+}
+.legend-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 4rpx;
+}
+.dot-available { background: #10b981; }
+.dot-charging { background: #f59e0b; }
+.dot-other { background: var(--gray-200); }
+.resource-hint {
+  font-size: var(--radius-md);
+  color: #ef4444;
+  display: block;
+  text-align: center;
+  margin-top: 8rpx;
+}
+.resource-hint.good {
+  color: #10b981;
+}
+
+/* ── 电池状态标签 ─────────────────────────────────── */
+.battery-status-tag {
+  font-size: 22rpx;
+  padding: 4rpx var(--radius-sm);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+.status-tag-available { background: #ecfdf5; color: #059669; }
+.status-tag-charging { background: #fef9c3; color: #92400e; }
+.status-tag-rented { background: #eff6ff; color: #1d4ed8; }
+.status-tag-maintenance { background: #fef2f2; color: #dc2626; }
+
+/* ── 电池电量迷你进度条 ──────────────────────────── */
+.battery-right {
+  display: flex;
+  align-items: center;
+  gap: var(--radius-sm);
+}
+.power-bar-mini {
+  width: var(--btn-height);
+  height: var(--radius-sm);
+  background: var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.power-fill-mini {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition: width 0.3s;
+}
+.power-high { background: #10b981; }
+.power-mid { background: #f59e0b; }
+.power-low { background: #ef4444; }
+
+/* 底部固定操作栏 */
+.bottom-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: var(--radius-md);
+  padding: var(--radius-md) 30rpx;
+  padding-bottom: calc(var(--radius-md) + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -4rpx var(--radius-md) rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.action-bar-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+}
+
+.btn-report {
+  background: #fff;
+  color: #ff4d4f;
+  border: 2rpx solid #ff4d4f;
+}
+
+.btn-navigate {
+  background: linear-gradient(135deg, #1890ff, #096dd9);
+  color: #fff;
+  box-shadow: 0 4rpx var(--radius-sm) rgba(24, 144, 255, 0.3);
+}
+
+.btn-icon {
+  font-size: var(--space-16);
+}
+
+.btn-text {
+  font-size: 30rpx;
+}
+
+/* 为底部操作栏留出空间 */
+.container {
+  padding-bottom: 140rpx;
+}
+
+

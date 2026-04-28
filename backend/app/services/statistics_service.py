@@ -1,0 +1,330 @@
+"""
+数据统计服务
+"""
+from datetime import datetime, timedelta
+from flask import g
+from ..models import Order, User, Battery, ExchangeRecord, Payment
+from .. import db
+from sqlalchemy import func
+
+class StatisticsService:
+    """数据统计服务类"""
+
+    @staticmethod
+    def get_revenue_statistics(start_date=None, end_date=None, period='day'):
+        """
+        获取营收统计
+        
+        Args:
+            start_date: 开始日期
+            end_date: 结束日期
+            period: 统计周期 (day/week/month/year)
+        
+        Returns:
+            营收统计数据
+        """
+        try:
+            if not start_date:
+                if period == 'day':
+                    start_date = datetime.now().date()
+                elif period == 'week':
+                    start_date = (datetime.now() - timedelta(days=7)).date()
+                elif period == 'month':
+                    start_date = (datetime.now() - timedelta(days=30)).date()
+                else:  # year
+                    start_date = (datetime.now() - timedelta(days=365)).date()
+
+            if not end_date:
+                end_date = datetime.now().date()
+
+            # 获取完成的订单
+            completed_orders = Order.query.filter(
+                Order.status == 'completed',
+                Order.created_at >= start_date,
+                Order.created_at <= end_date,
+                Order.tenant_id == g.tenant_id,
+                Order.is_deleted == False
+            ).all()
+
+            total_revenue = sum(float(order.total_amount or 0) for order in completed_orders)
+            order_count = len(completed_orders)
+
+            # 按日期分组统计
+            daily_stats = {}
+            for order in completed_orders:
+                date_key = order.created_at.strftime('%Y-%m-%d')
+                if date_key not in daily_stats:
+                    daily_stats[date_key] = {'revenue': 0, 'count': 0}
+                daily_stats[date_key]['revenue'] += float(order.total_amount or 0)
+                daily_stats[date_key]['count'] += 1
+
+            return {
+                'total_revenue': round(total_revenue, 2),
+                'order_count': order_count,
+                'average_order_value': round(total_revenue / order_count, 2) if order_count > 0 else 0,
+                'daily_stats': daily_stats,
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat()
+            }
+
+        except Exception as e:
+            return {
+                'total_revenue': 0,
+                'order_count': 0,
+                'average_order_value': 0,
+                'daily_stats': {},
+                'error': str(e)
+            }
+
+    @staticmethod
+    def get_order_statistics(start_date=None, end_date=None):
+        """
+        获取订单统计
+        
+        Args:
+            start_date: 开始日期
+            end_date: 结束日期
+        
+        Returns:
+            订单统计数据
+        """
+        try:
+            if not start_date:
+                start_date = (datetime.now() - timedelta(days=30)).date()
+            if not end_date:
+                end_date = datetime.now().date()
+
+            query = Order.query.filter(
+                Order.created_at >= start_date,
+                Order.created_at <= end_date,
+                Order.tenant_id == g.tenant_id,
+                Order.is_deleted == False
+            )
+
+            total_orders = query.count()
+            pending_orders = query.filter_by(status='pending').count()
+            paid_orders = query.filter_by(status='paid').count()
+            rented_orders = query.filter_by(status='rented').count()
+            completed_orders = query.filter_by(status='completed').count()
+            cancelled_orders = query.filter_by(status='cancelled').count()
+
+            # 按订单类型统计
+            rental_orders = query.filter_by(order_type='rental').count()
+            purchase_orders = query.filter_by(order_type='purchase').count()
+            exchange_orders = query.filter_by(order_type='exchange').count()
+
+            return {
+                'total_orders': total_orders,
+                'pending_orders': pending_orders,
+                'paid_orders': paid_orders,
+                'rented_orders': rented_orders,
+                'completed_orders': completed_orders,
+                'cancelled_orders': cancelled_orders,
+                'by_type': {
+                    'rental': rental_orders,
+                    'purchase': purchase_orders,
+                    'exchange': exchange_orders
+                },
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat()
+            }
+
+        except Exception as e:
+            return {
+                'total_orders': 0,
+                'pending_orders': 0,
+                'paid_orders': 0,
+                'rented_orders': 0,
+                'completed_orders': 0,
+                'cancelled_orders': 0,
+                'by_type': {},
+                'error': str(e)
+            }
+
+    @staticmethod
+    def get_battery_statistics():
+        """
+        获取电池统计
+        
+        Returns:
+            电池统计数据
+        """
+        try:
+            total_batteries = Battery.query.filter_by(
+                tenant_id=g.tenant_id,
+                is_deleted=False
+            ).count()
+
+            available_batteries = Battery.query.filter_by(
+                status='available',
+                tenant_id=g.tenant_id,
+                is_deleted=False
+            ).count()
+
+            rented_batteries = Battery.query.filter(
+                Battery.status.in_(['rented', 'in_use', 'charging']),
+                Battery.tenant_id == g.tenant_id,
+                Battery.is_deleted == False
+            ).count()
+
+            maintenance_batteries = Battery.query.filter_by(
+                status='maintenance',
+                tenant_id=g.tenant_id,
+                is_deleted=False
+            ).count()
+
+            # 计算使用率
+            utilization_rate = (rented_batteries / total_batteries * 100) if total_batteries > 0 else 0
+
+            # 获取电池平均电量
+            avg_power = db.session.query(func.avg(Battery.power_level)).filter(
+                Battery.tenant_id == g.tenant_id,
+                Battery.is_deleted == False
+            ).scalar() or 0
+
+            return {
+                'total_batteries': total_batteries,
+                'available_batteries': available_batteries,
+                'rented_batteries': rented_batteries,
+                'maintenance_batteries': maintenance_batteries,
+                'utilization_rate': round(utilization_rate, 2),
+                'average_power_level': round(float(avg_power), 2)
+            }
+
+        except Exception as e:
+            return {
+                'total_batteries': 0,
+                'available_batteries': 0,
+                'rented_batteries': 0,
+                'maintenance_batteries': 0,
+                'utilization_rate': 0,
+                'average_power_level': 0,
+                'error': str(e)
+            }
+
+    @staticmethod
+    def get_user_statistics():
+        """
+        获取用户统计
+        
+        Returns:
+            用户统计数据
+        """
+        try:
+            total_users = User.query.filter_by(
+                tenant_id=g.tenant_id,
+                is_deleted=False
+            ).count()
+
+            active_users = User.query.filter(
+                User.last_login_at >= datetime.now() - timedelta(days=30),
+                User.tenant_id == g.tenant_id,
+                User.is_deleted == False
+            ).count()
+
+            verified_users = User.query.filter_by(
+                is_verified=True,
+                tenant_id=g.tenant_id,
+                is_deleted=False
+            ).count()
+
+            # 获取新用户（最近7天）
+            new_users = User.query.filter(
+                User.created_at >= datetime.now() - timedelta(days=7),
+                User.tenant_id == g.tenant_id,
+                User.is_deleted == False
+            ).count()
+
+            return {
+                'total_users': total_users,
+                'active_users': active_users,
+                'verified_users': verified_users,
+                'new_users': new_users,
+                'verification_rate': round(verified_users / total_users * 100, 2) if total_users > 0 else 0
+            }
+
+        except Exception as e:
+            return {
+                'total_users': 0,
+                'active_users': 0,
+                'verified_users': 0,
+                'new_users': 0,
+                'verification_rate': 0,
+                'error': str(e)
+            }
+
+    @staticmethod
+    def get_dashboard_summary():
+        """
+        获取仪表板摘要（综合统计）
+
+        Returns:
+            仪表板数据
+        """
+        try:
+            today = datetime.now().date()
+
+            # 今日订单
+            today_orders = Order.query.filter(
+                Order.created_at >= today,
+                Order.tenant_id == g.tenant_id,
+                Order.is_deleted == False
+            ).count()
+
+            # 今日营收
+            today_revenue = db.session.query(func.sum(Order.total_amount)).filter(
+                Order.status == 'completed',
+                Order.created_at >= today,
+                Order.tenant_id == g.tenant_id,
+                Order.is_deleted == False
+            ).scalar() or 0
+
+            # 电池统计
+            battery_stats = StatisticsService.get_battery_statistics()
+
+            # 用户统计
+            user_stats = StatisticsService.get_user_statistics()
+
+            # 近7天收入趋势
+            revenue_trend = []
+            for i in range(6, -1, -1):
+                date = today - timedelta(days=i)
+                daily_revenue = db.session.query(func.sum(Order.total_amount)).filter(
+                    Order.status == 'completed',
+                    func.date(Order.created_at) == date,
+                    Order.tenant_id == g.tenant_id,
+                    Order.is_deleted == False
+                ).scalar() or 0
+                revenue_trend.append(round(float(daily_revenue), 2))
+
+            # 近30天订单趋势
+            order_trend = []
+            for i in range(29, -1, -1):
+                date = today - timedelta(days=i)
+                daily_orders = Order.query.filter(
+                    func.date(Order.created_at) == date,
+                    Order.tenant_id == g.tenant_id,
+                    Order.is_deleted == False
+                ).count()
+                order_trend.append(daily_orders)
+
+            return {
+                'today_orders': today_orders,
+                'today_revenue': round(float(today_revenue), 2),
+                'battery_stats': battery_stats,
+                'user_stats': user_stats,
+                'revenue_trend': revenue_trend,
+                'order_trend': order_trend,
+                'timestamp': datetime.now().isoformat()
+            }
+
+        except Exception as e:
+            return {
+                'today_orders': 0,
+                'today_revenue': 0,
+                'battery_stats': {},
+                'user_stats': {},
+                'revenue_trend': [0] * 7,
+                'order_trend': [0] * 30,
+                'error': str(e)
+            }

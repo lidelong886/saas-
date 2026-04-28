@@ -1,0 +1,54 @@
+<view class="container">
+  <view class="tab-header">
+    <view class="tab {{activeTab === 'rented' ? 'active' : ''}}" bindtap="switchTab" data-tab="rented">在租电池</view>
+    <view class="tab {{activeTab === 'owned' ? 'active' : ''}}" bindtap="switchTab" data-tab="owned">我的专属电池</view>
+  </view>
+
+  <view class="content" wx:if="{{activeTab === 'rented'}}">
+    <view class="empty" wx:if="{{!loading && rentedBatteries.length === 0}}">当前暂无在租电池</view>
+    <view class="card" wx:for="{{rentedBatteries}}" wx:key="id" bindtap="onTap" data-id="{{item.id}}">
+      <view class="row">
+        <text class="code">电池编号：{{item.battery_code}}</text>
+        <text class="st active-st">租用中</text>
+      </view>
+      <text class="meta">当前电量: <text class="highlight">{{item.power_level != null ? item.power_level + '%' : '-'}}</text></text>
+      <view class="actions">
+        <button class="btn btn-primary" catchtap="goToReturn">去归还</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="content" wx:if="{{activeTab === 'owned'}}">
+    <view class="empty" wx:if="{{!loading && ownedBatteries.length === 0}}">
+      您还未购买专属私人电池
+      <button class="btn btn-outline" style="margin-top: 30rpx;" bindtap="goToBuyBattery">前往商城购买</button>
+    </view>
+    <view class="card {{item.is_charging ? 'charging-card' : ''}}" wx:for="{{ownedBatteries}}" wx:key="id">
+      <view class="row">
+        <text class="code">型号：{{item.model || '通用电池'}}</text>
+        <text class="st {{item.is_charging ? 'charging-st' : 'idle-st'}}">{{item.is_charging ? '充电中' : '闲置/使用中'}}</text>
+      </view>
+      
+      <!-- 专属充电液位动画 UI -->
+      <view class="charging-ui" wx:if="{{item.is_charging}}">
+        <view class="battery-body">
+          <view class="battery-level" style="height: {{item.power_level}}%;"></view>
+          <text class="battery-pct">{{item.power_level}}%</text>
+        </view>
+        <view class="charging-info">
+          <text class="ci-title">⚡ 专属电池充电中</text>
+          <text class="ci-desc">正在 <text class="ci-highlight">{{item.station_name}}</text> 充电</text>
+          <text class="ci-desc">预计 <text class="ci-highlight">{{item.charging_eta_minutes}}分钟</text> 后充满</text>
+          <text class="ci-save">本次专享低价充电，预计省下 1.5 元</text>
+        </view>
+      </view>
+
+      <view class="normal-info" wx:else>
+        <text class="meta">当前电量: <text class="highlight">{{item.power_level != null ? item.power_level + '%' : '-'}}</text></text>
+        <text class="meta desc">您可以将其放入任意空闲电柜进行便宜充电，不对外出租</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+</view>

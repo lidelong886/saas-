@@ -1,0 +1,141 @@
+/* pages/notification/list.wxss */
+.container {
+  padding: 0 0 var(--radius-md);
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--radius-md) 30rpx;
+  background: #fff;
+  margin-bottom: 10rpx;
+}
+
+.unread-info {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.mark-all-btn {
+  min-height: 64rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  font-weight: 800;
+  color: var(--primary-dark);
+  background: rgba(20, 184, 166, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.noti-item {
+  display: flex;
+  padding: var(--radius-md) 30rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.noti-item.unread {
+  background: #fafcff;
+}
+
+.noti-icon-wrap {
+  position: relative;
+  margin-right: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.noti-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-base);
+  color: #fff;
+  font-weight: 600;
+}
+
+.noti-icon-order { background: #1890ff; }
+.noti-icon-exchange { background: #52c41a; }
+.noti-icon-system { background: #fa8c16; }
+.noti-icon-fault { background: #f5222d; }
+
+.unread-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16rpx;
+  height: 16rpx;
+  background: #ff4d4f;
+  border-radius: 50%;
+  border: 2rpx solid #fff;
+}
+
+.noti-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.noti-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.noti-type-label {
+  font-size: var(--radius-md);
+  color: #999;
+}
+
+.noti-time {
+  font-size: 22rpx;
+  color: #bbb;
+}
+
+.noti-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6rpx;
+}
+
+.noti-item.unread .noti-title {
+  color: #000;
+}
+
+.noti-body {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.empty-state {
+  text-align: center;
+  padding-top: 200rpx;
+}
+
+.empty-text {
+  font-size: var(--text-base);
+  color: #999;
+}
+
+.loading {
+  text-align: center;
+  padding: 30rpx;
+  color: #999;
+  font-size: 26rpx;
+}
+
+

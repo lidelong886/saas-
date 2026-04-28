@@ -1,0 +1,217 @@
+<!--pages/index/index.wxml-->
+<view class="container {{mode === 'delivery' ? 'delivery-mode' : ''}}">
+  <view class="service-bar" bindtap="onSwitchTenantTap">
+    <view class="service-copy">
+      <text class="service-label">当前服务</text>
+      <text class="service-name">{{tenantName}}</text>
+    </view>
+    <text class="service-action">切换 ></text>
+  </view>
+
+  <!-- 模式切换器 -->
+  <mode-switcher mode="{{mode}}" bind:change="onModeChange"></mode-switcher>
+
+  <!-- 送单模式布局 -->
+  <view wx:if="{{mode === 'delivery'}}" class="delivery-layout">
+    <!-- 余额和套餐状态 -->
+    <view class="delivery-status" wx:if="{{hasLogin}}">
+      <view class="status-item">
+        <text class="status-label">账户余额</text>
+        <text class="status-value">¥{{userBalanceText}}</text>
+      </view>
+      <view class="status-item">
+        <text class="status-label">当前套餐</text>
+        <text class="status-value">{{userPackageStatus}}</text>
+      </view>
+    </view>
+
+    <!-- 送单模式：剩余电量卡片 -->
+    <view class="delivery-battery-card insight-{{batteryInsight.alertLevel}}" wx:if="{{hasLogin && batteryInsight}}" bindtap="onBatteryInsightTap">
+      <view class="delivery-battery-main">
+        <view class="delivery-battery-copy">
+          <text class="delivery-battery-label">剩余电量</text>
+          <text class="delivery-battery-power">{{batteryInsight.powerLevel}}%</text>
+          <text class="delivery-battery-tip">{{batteryInsight.durationText}}</text>
+        </view>
+        <view class="delivery-battery-badge">{{batteryInsight.alertTag}}</view>
+      </view>
+      <view class="delivery-power-track">
+        <view class="delivery-power-fill" style="width: {{batteryInsight.powerLevel}}%"></view>
+      </view>
+      <view class="delivery-battery-footer">
+        <text>{{batteryInsight.rangeText}}</text>
+        <text class="delivery-battery-action">去换电 ></text>
+      </view>
+    </view>
+
+    <view class="delivery-battery-card no-battery" wx:elif="{{hasLogin}}" bindtap="onScanTap">
+      <view class="delivery-battery-main">
+        <view class="delivery-battery-copy">
+          <text class="delivery-battery-label">剩余电量</text>
+          <text class="delivery-battery-power small">暂无租用电池</text>
+          <text class="delivery-battery-tip">扫码租电后将显示续航预估</text>
+        </view>
+        <view class="delivery-battery-badge">去租电</view>
+      </view>
+    </view>
+
+    <!-- 最近3个换电站 -->
+    <view class="delivery-stations">
+      <view class="section-title-delivery">附近换电站</view>
+      <view class="delivery-station-list" wx:if="{{nearbyStations.length > 0}}">
+        <view class="delivery-station-card" wx:for="{{nearbyStations}}" wx:key="id" wx:if="{{index < 3}}">
+          <view class="station-main" bindtap="onStationTap" data-id="{{item.id}}">
+            <view class="station-name-delivery">{{item.name}}</view>
+            <view class="station-info-row">
+              <view class="info-block">
+                <text class="info-number">{{item.distance != null ? item.distance : '-'}}</text>
+                <text class="info-unit">米</text>
+              </view>
+              <view class="info-block">
+                <text class="info-number highlight">{{item.available_batteries || 0}}</text>
+                <text class="info-unit">可用</text>
+              </view>
+            </view>
+          </view>
+          <view class="station-nav-btn" catchtap="onNavToStation" data-item="{{item}}">
+            <text class="nav-text">导航</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty-state-delivery" wx:else>
+        <text class="empty-text">附近暂无站点</text>
+      </view>
+    </view>
+
+    <!-- 大号扫码按钮 -->
+    <view class="scan-button-delivery" bindtap="onScanTap">
+      <view class="scan-icon-large">📷</view>
+      <text class="scan-text-large">扫码换电</text>
+    </view>
+  </view>
+
+  <!-- 普通模式布局（原有布局） -->
+  <view wx:else class="normal-layout">
+  <!-- 顶部状态栏: 显示简单的用户信息和电量概览 -->
+  <view class="top-header" wx:if="{{hasLogin && batteryInsight}}">
+    <view class="battery-status insight-{{batteryInsight.alertLevel}}" bindtap="onBatteryInsightTap">
+      <view class="status-left">
+        <view class="battery-icon">
+          <text>电池</text>
+        </view>
+        <view class="status-text">
+          <text class="power-text">{{batteryInsight.powerLevel}}%</text>
+          <text class="range-text">预计还可骑行 {{batteryInsight.estimatedRangeKm}}km</text>
+        </view>
+      </view>
+      <text class="status-action">换电 ></text>
+    </view>
+  </view>
+
+  <view class="top-header-empty" wx:elif="{{hasLogin}}">
+    <view class="battery-status insight-normal" bindtap="onScanTap">
+      <view class="status-left">
+        <view class="battery-icon">
+          <text>电池</text>
+        </view>
+        <view class="status-text">
+          <text class="power-text">暂无租用电池</text>
+          <text class="range-text">点击扫码即可租电</text>
+        </view>
+      </view>
+      <text class="status-action">去租电 ></text>
+    </view>
+  </view>
+
+  <!-- 紧急告警条 -->
+  <view class="alert-banner alert-{{batteryInsight.alertLevel}}" wx:if="{{alertBannerText}}" bindtap="onNavToRecommend">
+    <view class="alert-content">
+      <text class="alert-icon">{{alertIconText}}</text>
+      <text class="alert-text">{{alertBannerText}}</text>
+    </view>
+  </view>
+
+  <!-- 极简推荐站点卡片 -->
+  <view class="recommend-station-card" wx:if="{{recommendedStation}}" bindtap="onRecommendationTap">
+    <view class="recommend-station-top">
+      <view>
+        <text class="recommend-station-label">距您最近</text>
+        <text class="recommend-station-name">{{recommendedStation.name}}</text>
+        <text class="recommend-station-address">{{recommendedStation.address}}</text>
+      </view>
+      <view class="recommend-top-right">
+        <view class="station-battery-badge">
+          <text class="badge-number">{{recommendedStation.available_batteries || 0}}</text>
+          <text class="badge-label">可用</text>
+        </view>
+      </view>
+    </view>
+    <view class="recommend-station-meta">
+      <text class="recommend-meta-item">骑行约 {{recommendedStation.etaMinutes || '-'}} 分钟</text>
+      <text class="recommend-meta-item">距离 {{recommendedDistanceText}}</text>
+    </view>
+    <!-- 导航按钮 -->
+    <view class="nav-button" catchtap="onNavToRecommend">
+      <text class="nav-icon">导航</text>
+      <text class="nav-text">立即导航去换电</text>
+    </view>
+  </view>
+
+  <!-- 推荐套餐 -->
+  <view class="section" wx:if="{{hasLogin && recommendedPackages.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">推荐套餐</text>
+      <text class="section-more" bindtap="onViewAllPackages">查看全部</text>
+    </view>
+
+    <view class="package-list">
+      <view class="package-card" wx:for="{{recommendedPackages}}" wx:key="id" bindtap="onPackageTap" data-id="{{item.id}}">
+        <view class="package-header">
+          <text class="package-name">{{item.name}}</text>
+          <text class="package-price">¥{{item.price}}</text>
+        </view>
+        <text class="package-desc">{{item.description}}</text>
+        <view class="package-meta">
+          <text class="package-duration">有效期 {{item.duration_days}} 天</text>
+          <text class="package-times">可换 {{item.swap_times}} 次</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 附近站点列表(极简版) -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">周边站点</text>
+      <text class="section-more" bindtap="onViewMoreStations">查看地图</text>
+    </view>
+
+    <view class="station-list" wx:if="{{nearbyStations.length > 0}}">
+      <view class="station-card" wx:for="{{nearbyStations}}" wx:key="id" bindtap="onStationTap" data-id="{{item.id}}">
+        <view class="station-info">
+          <text class="station-name">{{item.name}}</text>
+          <view class="station-meta">
+            <text class="station-distance">距 {{item.distance != null ? item.distance + 'm' : '-'}}</text>
+            <text class="station-batteries">可换 {{item.available_batteries}} 块</text>
+          </view>
+        </view>
+        <view class="station-nav" catchtap="onNavToStation" data-item="{{item}}">
+          <text class="nav-icon-small">导航</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <text class="empty-text">附近暂无站点</text>
+    </view>
+  </view>
+
+  <!-- 超大扫码按钮 - 骑手最常用的功能 -->
+  <view class="scan-button-giant" bindtap="onScanTap">
+    <view class="scan-inner">
+      <text class="scan-icon-giant">扫码</text>
+      <text class="scan-button-text">扫码取电</text>
+    </view>
+  </view>
+  </view>
+</view>

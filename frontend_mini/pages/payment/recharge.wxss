@@ -1,0 +1,152 @@
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 200rpx;
+}
+
+.header {
+  background: #fff;
+  padding: 40rpx var(--space-16);
+  text-align: center;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.amount-section {
+  background: #fff;
+  margin: var(--radius-md) 0;
+  padding: var(--space-16);
+}
+
+.section-title {
+  display: block;
+  font-size: var(--text-base);
+  color: #666;
+  margin-bottom: var(--radius-md);
+}
+
+.preset-amounts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--radius-md);
+  margin-bottom: var(--space-16);
+}
+
+.amount-item {
+  height: 112rpx;
+  border: 2rpx solid #e5e5e5;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+}
+
+.amount-item.selected {
+  border-color: var(--primary);
+  background: #eef2ff;
+}
+
+.amount-value {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.amount-item.selected .amount-value {
+  color: var(--primary);
+}
+
+.custom-amount {
+  border-top: 2rpx solid #f0f0f0;
+  padding-top: var(--space-16);
+}
+
+.custom-label {
+  display: block;
+  font-size: var(--text-base);
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.custom-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 2rpx solid #e5e5e5;
+  border-radius: var(--radius-md);
+  padding: 0 var(--radius-md);
+  height: 100rpx;
+  background: #fafafa;
+}
+
+.currency {
+  font-size: 36rpx;
+  color: #999;
+  margin-right: 8rpx;
+}
+
+.custom-input {
+  flex: 1;
+  font-size: 36rpx;
+  color: #333;
+}
+
+.tips {
+  background: #fff;
+  margin: var(--radius-md) 0;
+  padding: var(--space-16);
+}
+
+.tip-item {
+  display: block;
+  font-size: var(--radius-md);
+  color: #999;
+  line-height: 2;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: var(--radius-md) var(--space-16);
+  box-shadow: 0 -4rpx 16rpx var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.total {
+  display: flex;
+  flex-direction: column;
+}
+
+.total-label {
+  font-size: var(--radius-md);
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.total-amount {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ff4d4f;
+}
+
+.recharge-btn {
+  width: 288rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: var(--space-16);
+  font-weight: 700;
+}
+
+

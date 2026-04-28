@@ -1,0 +1,5 @@
+{
+  "navigationBarTitleText": "支付记录",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50
+}

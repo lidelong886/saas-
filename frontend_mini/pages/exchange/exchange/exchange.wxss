@@ -1,0 +1,1053 @@
+/* pages/exchange/exchange/exchange.wxss */
+
+.exchange-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  padding-bottom: 160rpx;
+}
+
+/* 无电池引导卡片 */
+.no-battery-hero {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  margin: 32rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 8rpx 24rpx rgba(16, 185, 129, 0.4);
+}
+
+.hero-icon {
+  font-size: 72rpx;
+  margin-bottom: 16rpx;
+}
+
+.hero-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 10rpx;
+}
+
+.hero-subtitle {
+  font-size: var(--radius-md);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* 步骤条 */
+.step-bar {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  padding: 40rpx 48rpx;
+  margin: 0 32rpx 24rpx;
+  border-radius: 20rpx;
+}
+
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  flex: 1;
+}
+
+.step-dot {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 22rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration);
+}
+
+.step-item.active .step-dot {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  box-shadow: 0 4rpx 16rpx rgba(16, 185, 129, 0.4);
+}
+
+.step-text {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.3s;
+}
+
+.step-item.active .step-text {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.step-line {
+  flex: 0.6;
+  height: 4rpx;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 8rpx;
+  margin-bottom: 28rpx;
+  transition: background 0.3s;
+}
+
+.step-line.active {
+  background: #10b981;
+}
+
+/* 内容区 */
+.step-content {
+  padding: var(--radius-md);
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: white;
+  margin-bottom: var(--radius-md);
+  padding: 0 32rpx;
+}
+
+/* 当前电池提示 */
+.current-battery-tip {
+  background: #f0fdf4;
+  border: 1rpx solid #bbf7d0;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md) var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--radius-sm);
+  font-size: 26rpx;
+  color: #166534;
+  margin-bottom: var(--radius-md);
+}
+
+.current-battery-tip.highlight {
+  background: #fef9c3;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+/* 站点卡片 */
+.station-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 0 32rpx;
+}
+
+.station-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20rpx);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+  border-radius: 20rpx;
+  padding: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.station-card:active {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.station-info {
+  flex: 1;
+}
+
+.station-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8rpx;
+}
+
+.station-address {
+  font-size: var(--radius-md);
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: var(--radius-sm);
+}
+
+.station-meta {
+  display: flex;
+  gap: var(--radius-sm);
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 22rpx;
+  padding: 4rpx var(--radius-sm);
+  border-radius: var(--radius-sm);
+}
+
+.meta-tag.available {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.meta-tag.distance {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--primary-light);
+}
+
+.station-arrow {
+  font-size: 40rpx;
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+/* 电池卡片 */
+.battery-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 0 32rpx;
+}
+
+.battery-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20rpx);
+  border: 2rpx solid rgba(255, 255, 255, 0.1);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.battery-card.selected {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  box-shadow: 0 4rpx 16rpx rgba(16, 185, 129, 0.3);
+}
+
+.battery-code {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 10rpx;
+}
+
+.battery-meta {
+  display: flex;
+  gap: 10rpx;
+  flex-wrap: wrap;
+}
+
+.battery-select-icon {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 3rpx solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.battery-select-icon.checked {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-size: 22rpx;
+}
+
+/* 已选站点条 */
+.selected-station-bar {
+  background: #eff6ff;
+  border-radius: var(--radius-sm);
+  padding: 16rpx var(--radius-md);
+  display: flex;
+  font-size: var(--radius-md);
+  margin-bottom: 16rpx;
+  color: #1d4ed8;
+}
+
+/* 确认卡片 */
+.confirm-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: var(--space-16);
+  box-shadow: 0 2rpx var(--radius-sm) rgba(0, 0, 0, 0.06);
+  margin-bottom: var(--radius-md);
+}
+
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+}
+
+.confirm-label {
+  font-size: 26rpx;
+  color: var(--gray-500);
+}
+
+.confirm-value {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.confirm-value.old {
+  color: #ef4444;
+}
+
+.confirm-value.new {
+  color: #22c55e;
+}
+
+.confirm-arrow {
+  text-align: center;
+  font-size: 36rpx;
+  color: var(--gray-400);
+  padding: 8rpx 0;
+}
+
+.confirm-divider {
+  height: 1rpx;
+  background: var(--gray-100);
+  margin: 8rpx 0;
+}
+
+/* 费用说明 */
+.fee-note {
+  background: #fef9c3;
+  border: 1rpx solid #fde68a;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md) var(--radius-md);
+  display: flex;
+  gap: 10rpx;
+  font-size: var(--radius-md);
+  color: #92400e;
+  line-height: 1.6;
+}
+
+/* 空状态 */
+.exchange-warning-card {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: linear-gradient(135deg, #fff7ed, #fffbeb);
+  border: 2rpx solid #fdba74;
+  border-radius: var(--radius-md);
+  padding: var(--radius-md) var(--radius-md);
+  margin-bottom: var(--radius-md);
+}
+
+.exchange-warning-icon {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: var(--cta);
+  color: #fff;
+  font-size: var(--text-base);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.exchange-warning-text {
+  flex: 1;
+  font-size: var(--radius-md);
+  line-height: 1.6;
+  color: #9a3412;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--btn-height) 40rpx;
+  gap: var(--radius-md);
+}
+
+.empty-icon {
+  font-size: var(--btn-height);
+}
+
+.empty-text {
+  font-size: var(--text-base);
+  color: var(--gray-400);
+  text-align: center;
+}
+
+.retry-btn {
+  background: var(--primary);
+  color: #fff;
+  font-size: 26rpx;
+  padding: 16rpx 40rpx;
+  border-radius: 40rpx;
+  border: none;
+}
+
+/* 加载状态 */
+.loading-state {
+  text-align: center;
+  padding: 60rpx;
+  color: var(--gray-400);
+  font-size: 26rpx;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: var(--radius-md) var(--space-16);
+  padding-bottom: calc(var(--radius-md) + env(safe-area-inset-bottom));
+  display: flex;
+  gap: var(--radius-md);
+  box-shadow: 0 -4rpx var(--radius-md) rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.back-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  border: 2rpx solid var(--gray-200);
+  background: #fff;
+  color: var(--gray-500);
+  font-size: var(--text-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-btn {
+  flex: 2;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 10rpx var(--radius-md) rgba(20, 184, 166, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-btn-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--radius-sm);
+}
+
+.confirm-btn-icon {
+  font-size: var(--space-16);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.confirm-btn-text {
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.confirm-btn.disabled {
+  background: var(--gray-200);
+  color: var(--gray-400);
+  box-shadow: none;
+}
+
+.confirm-btn.loading {
+  opacity: 0.7;
+}
+
+.confirm-btn.loading .confirm-btn-icon {
+  transform: rotate(0deg);
+  animation: exchangeSpin 0.9s linear infinite;
+}
+
+@keyframes exchangeSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 无更多 */
+.no-more {
+  text-align: center;
+  padding: var(--radius-md);
+  font-size: 22rpx;
+  color: var(--gray-400);
+}
+
+/* Force height to show background */
+.exchange-page { min-height: 100vh; padding-bottom: 112rpx; }
+
+/* ── 电量预估卡片 ─────────────────────────────────── */
+.insight-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: var(--radius-md);
+  margin-bottom: var(--radius-md);
+  border-left: 8rpx solid #10b981;
+  box-shadow: 0 2rpx var(--radius-sm) rgba(0, 0, 0, 0.06);
+}
+.insight-card.insight-warning {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, #fffbeb, #fff);
+}
+.insight-card.insight-emergency {
+  border-left-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2, #fff);
+}
+.insight-card.insight-excellent {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, #ecfdf5, #fff);
+}
+.insight-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--radius-sm);
+}
+.insight-left {
+  display: flex;
+  flex-direction: column;
+}
+.insight-power {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--gray-900);
+}
+.insight-range {
+  font-size: 22rpx;
+  color: var(--gray-500);
+  margin-top: 4rpx;
+}
+.insight-badge {
+  font-size: 22rpx;
+  font-weight: 700;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  color: #fff;
+  background: #10b981;
+}
+.insight-warning .insight-badge { background: #f59e0b; }
+.insight-emergency .insight-badge { background: #ef4444; }
+.insight-tip {
+  font-size: var(--radius-md);
+  color: var(--gray-600);
+  display: block;
+}
+
+/* ── 智能推荐卡片 ─────────────────────────────────── */
+.recommend-card {
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border-radius: var(--radius-md);
+  padding: var(--radius-md);
+  margin-bottom: var(--radius-md);
+  border: 2rpx solid #c7d2fe;
+}
+.recommend-header {
+  display: flex;
+  align-items: center;
+  gap: var(--radius-sm);
+  margin-bottom: 16rpx;
+}
+.recommend-label {
+  font-size: var(--radius-md);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  padding: 4rpx 14rpx;
+  border-radius: var(--radius-sm);
+}
+.recommend-reason {
+  font-size: 22rpx;
+  color: var(--primary);
+}
+.recommend-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.recommend-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--gray-800);
+  display: block;
+  margin-bottom: 8rpx;
+}
+.recommend-meta {
+  display: flex;
+  gap: 10rpx;
+}
+.recommend-go {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--primary);
+  padding: var(--radius-sm) var(--radius-md);
+  background: #fff;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+}
+
+/* ── 站点资源条 ───────────────────────────────────── */
+.station-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-bottom: 8rpx;
+}
+.recommend-badge {
+  font-size: var(--radius-md);
+  color: #fff;
+  background: var(--primary);
+  padding: 2rpx 10rpx;
+  border-radius: var(--radius-sm);
+}
+.station-card.recommended {
+  border: 2rpx solid var(--primary);
+  background: #f5f3ff;
+}
+.resource-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--radius-sm);
+  margin-bottom: 10rpx;
+}
+.resource-bar {
+  flex: 1;
+  height: var(--radius-sm);
+  background: var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.resource-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition: width 0.3s;
+}
+.available-fill {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+.resource-text {
+  font-size: 22rpx;
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+.meta-tag.charging {
+  background: #fef9c3;
+  color: #92400e;
+}
+
+/* ── 明亮主题统一覆盖 ───────────────────────────────── */
+.exchange-page {
+  background: var(--brand-soft-gradient);
+  padding-top: 24rpx;
+  box-sizing: border-box;
+}
+
+.step-content {
+  padding: 0 24rpx 24rpx;
+}
+
+.no-battery-hero {
+  background: var(--brand-gradient);
+  border-radius: 32rpx;
+  margin: 0 0 24rpx;
+  padding: 48rpx 32rpx;
+  box-shadow: 0 18rpx 44rpx rgba(20, 184, 166, 0.24);
+}
+
+.hero-title {
+  font-size: 40rpx;
+  font-weight: 900;
+}
+
+.hero-subtitle {
+  font-size: 28rpx;
+}
+
+.step-bar {
+  background: rgba(255, 255, 255, 0.94);
+  border: 2rpx solid rgba(20, 184, 166, 0.12);
+  border-radius: 28rpx;
+  margin: 0 24rpx 24rpx;
+  padding: 36rpx 32rpx;
+  box-shadow: 0 14rpx 36rpx rgba(20, 184, 166, 0.12);
+}
+
+.step-dot {
+  width: 56rpx;
+  height: 56rpx;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  font-size: 24rpx;
+}
+
+.step-item.active .step-dot {
+  background: var(--brand-gradient);
+  color: #ffffff;
+  box-shadow: 0 8rpx 20rpx rgba(20, 184, 166, 0.24);
+}
+
+.step-text {
+  color: var(--gray-500);
+  font-size: 23rpx;
+  font-weight: 600;
+}
+
+.step-item.active .step-text {
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.step-line {
+  background: var(--gray-100);
+}
+
+.step-line.active {
+  background: var(--primary);
+}
+
+.section-title {
+  color: var(--gray-900);
+  font-size: 34rpx;
+  font-weight: 900;
+  margin: 8rpx 0 18rpx;
+  padding: 0 4rpx;
+}
+
+.station-list,
+.battery-list {
+  padding: 0;
+  gap: 18rpx;
+}
+
+.station-card,
+.battery-card,
+.confirm-card,
+.insight-card,
+.recommend-card {
+  background: rgba(255, 255, 255, 0.96);
+  border: 2rpx solid rgba(20, 184, 166, 0.12);
+  border-radius: 28rpx;
+  box-shadow: 0 14rpx 36rpx rgba(20, 184, 166, 0.12);
+}
+
+.station-card,
+.battery-card {
+  padding: 30rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.station-card::before,
+.battery-card::before,
+.confirm-card::before,
+.recommend-card::before,
+.insight-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6rpx;
+  background: var(--brand-gradient);
+}
+
+.station-card:active,
+.battery-card:active {
+  transform: translateY(-2rpx) scale(0.99);
+  background: #ffffff;
+  box-shadow: 0 18rpx 44rpx rgba(20, 184, 166, 0.16);
+}
+
+.station-card.recommended,
+.battery-card.selected {
+  background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
+  border-color: var(--primary);
+  box-shadow: 0 16rpx 42rpx rgba(20, 184, 166, 0.2);
+}
+
+.station-info,
+.battery-info {
+  min-width: 0;
+}
+
+.station-name,
+.battery-code,
+.recommend-name {
+  color: var(--gray-900);
+  font-size: 32rpx;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.station-address {
+  color: var(--gray-500);
+  font-size: 25rpx;
+  line-height: 1.5;
+}
+
+.station-arrow {
+  color: var(--primary);
+  font-size: 52rpx;
+  font-weight: 300;
+}
+
+.meta-tag {
+  background: var(--gray-50);
+  color: var(--gray-600);
+  border: 2rpx solid rgba(20, 184, 166, 0.08);
+  border-radius: 999rpx;
+  padding: 8rpx 16rpx;
+  font-size: 23rpx;
+  font-weight: 700;
+}
+
+.meta-tag.available,
+.meta-tag.power {
+  background: #ecfdf5;
+  color: var(--primary-dark);
+}
+
+.meta-tag.distance,
+.meta-tag.type,
+.meta-tag.model {
+  background: #f8fafc;
+  color: var(--gray-600);
+}
+
+.recommend-badge,
+.insight-badge,
+.recommend-label {
+  background: var(--brand-gradient);
+  color: #ffffff;
+  border-radius: 999rpx;
+  font-weight: 800;
+}
+
+.recommend-badge {
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+}
+
+.resource-bar {
+  height: 16rpx;
+  background: var(--gray-100);
+  border-radius: 999rpx;
+}
+
+.resource-fill,
+.available-fill {
+  background: var(--brand-gradient);
+  border-radius: 999rpx;
+}
+
+.resource-text {
+  color: var(--gray-500);
+  font-weight: 700;
+}
+
+.current-battery-tip,
+.selected-station-bar,
+.fee-note,
+.exchange-warning-card {
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 10rpx 28rpx rgba(20, 184, 166, 0.08);
+}
+
+.current-battery-tip {
+  background: #ecfdf5;
+  border: 2rpx solid rgba(20, 184, 166, 0.18);
+  color: var(--primary-dark);
+}
+
+.current-battery-tip.highlight,
+.fee-note,
+.exchange-warning-card {
+  background: #fff7ed;
+  border: 2rpx solid rgba(245, 158, 11, 0.22);
+  color: #9a3412;
+}
+
+.exchange-warning-icon {
+  width: 48rpx;
+  height: 48rpx;
+  background: var(--cta);
+  font-size: 28rpx;
+}
+
+.exchange-warning-text,
+.fee-text {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.selected-station-bar {
+  background: #ecfdf5;
+  color: var(--primary-dark);
+  border: 2rpx solid rgba(20, 184, 166, 0.16);
+}
+
+.bar-label,
+.bar-value {
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.confirm-card,
+.insight-card,
+.recommend-card {
+  border-left: none;
+  margin-bottom: 24rpx;
+  padding: 30rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.insight-card.insight-warning::before {
+  background: linear-gradient(135deg, var(--warning), #f59e0b);
+}
+
+.insight-card.insight-emergency::before {
+  background: linear-gradient(135deg, var(--danger), var(--cta-dark));
+}
+
+.insight-power {
+  font-size: 48rpx;
+  color: var(--gray-900);
+}
+
+.insight-range,
+.insight-tip,
+.recommend-reason {
+  color: var(--gray-500);
+  font-weight: 600;
+}
+
+.insight-badge {
+  min-height: 52rpx;
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.insight-warning .insight-badge {
+  background: linear-gradient(135deg, var(--warning), #f59e0b);
+}
+
+.insight-emergency .insight-badge {
+  background: linear-gradient(135deg, var(--danger), var(--cta-dark));
+}
+
+.recommend-card {
+  background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);
+}
+
+.recommend-go {
+  min-height: 64rpx;
+  padding: 0 28rpx;
+  display: flex;
+  align-items: center;
+  background: rgba(20, 184, 166, 0.1);
+  color: var(--primary-dark);
+  font-weight: 900;
+}
+
+.battery-select-icon {
+  width: 52rpx;
+  height: 52rpx;
+  background: #ffffff;
+}
+
+.battery-select-icon.checked {
+  background: var(--brand-gradient);
+  border-color: transparent;
+}
+
+.confirm-card {
+  box-shadow: 0 14rpx 36rpx rgba(20, 184, 166, 0.12);
+}
+
+.confirm-label {
+  font-size: 28rpx;
+  color: var(--gray-500);
+  font-weight: 700;
+}
+
+.confirm-value {
+  font-size: 30rpx;
+  color: var(--gray-900);
+  font-weight: 900;
+}
+
+.empty-state {
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 28rpx;
+  margin: 0;
+}
+
+.empty-text,
+.loading-state,
+.no-more {
+  color: var(--gray-500);
+  font-weight: 600;
+}
+
+.retry-btn {
+  min-height: 82rpx;
+  padding: 0 48rpx;
+  background: var(--brand-gradient);
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  box-shadow: 0 10rpx 24rpx rgba(20, 184, 166, 0.24);
+}
+
+.bottom-bar {
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 2rpx solid rgba(20, 184, 166, 0.08);
+  box-shadow: 0 -12rpx 36rpx rgba(20, 184, 166, 0.12);
+}
+
+.back-btn,
+.confirm-btn {
+  height: 96rpx;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.back-btn {
+  color: var(--gray-600);
+  border: 2rpx solid var(--gray-200);
+}
+
+.confirm-btn {
+  background: var(--brand-gradient);
+  box-shadow: 0 12rpx 28rpx rgba(20, 184, 166, 0.26);
+}
+
+.confirm-btn.disabled {
+  background: var(--gray-200);
+  color: var(--gray-400);
+}
+
+

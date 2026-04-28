@@ -1,0 +1,68 @@
+.container {
+  min-height: 100vh;
+  padding: var(--radius-md);
+  background: #F0FDFA;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  padding: 28rpx var(--radius-md);
+  box-shadow: 0 8rpx var(--radius-md) rgba(0, 0, 0, 0.06);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f2f3f5;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: #606266;
+  font-size: 26rpx;
+}
+
+.value {
+  color: #303133;
+  font-size: 26rpx;
+  text-align: right;
+}
+
+.actions {
+  margin-top: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.refund-tip {
+  font-size: var(--radius-md);
+  color: #ef4444;
+  line-height: 1.6;
+}
+
+.empty-state {
+  margin-top: 160rpx;
+  text-align: center;
+  color: #909399;
+}
+
+.empty-icon {
+  font-size: 112rpx;
+  display: block;
+  margin-bottom: var(--radius-md);
+}
+
+.empty-text {
+  font-size: var(--text-base);
+  color: #999;
+}
+
+

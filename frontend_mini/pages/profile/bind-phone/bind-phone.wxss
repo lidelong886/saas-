@@ -1,0 +1,93 @@
+/* pages/profile/bind-phone.wxss */
+.container {
+  background: #F8FAFC;
+  min-height: 100vh;
+  padding: 40rpx var(--space-16);
+}
+
+.header {
+  margin-bottom: 48rpx;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #1f2937;
+  display: block;
+  margin-bottom: var(--radius-sm);
+}
+
+.subtitle {
+  font-size: var(--text-base);
+  color: #6b7280;
+}
+
+.form {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 8rpx 0;
+  margin-bottom: 40rpx;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-16) var(--space-16);
+  border-bottom: 1rpx solid #f3f4f6;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.code-item {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-input-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: var(--text-base);
+  color: #6b7280;
+  margin-bottom: 16rpx;
+}
+
+.input {
+  font-size: var(--space-16);
+  color: #1f2937;
+  padding: 16rpx 0;
+}
+
+.code-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 16rpx var(--radius-md);
+  font-size: var(--radius-md);
+  margin-left: 16rpx;
+  white-space: nowrap;
+}
+
+.code-btn[disabled] {
+  background: #e5e7eb;
+  color: #9ca3af;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 28rpx;
+  font-size: var(--space-16);
+  font-weight: 600;
+}
+
+

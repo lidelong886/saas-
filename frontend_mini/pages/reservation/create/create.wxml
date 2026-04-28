@@ -1,0 +1,88 @@
+<!-- 电池预约创建页面 -->
+<view class="reservation-create-page">
+  <!-- 顶部导航 -->
+  <view class="page-header">
+    <view class="header-title">预约电池</view>
+    <view class="header-subtitle">为您锁定电池，到站即换</view>
+  </view>
+
+  <!-- 站点信息 -->
+  <view class="station-info-card">
+    <view class="station-header">
+      <view class="station-name">{{station.name}}</view>
+      <view class="station-distance">{{station.distance}}km</view>
+    </view>
+    <view class="station-address">{{station.address}}</view>
+    <view class="station-status">
+      <battery-status available="{{station.available_batteries}}" total="{{station.total_batteries}}"></battery-status>
+      <text class="status-text">可用电池 {{station.available_batteries}}/{{station.total_batteries}}</text>
+    </view>
+  </view>
+
+  <!-- 电池选择 -->
+  <view class="battery-selection">
+    <view class="section-title">选择电池</view>
+    <scroll-view scroll-y class="battery-list">
+      <view
+        wx:for="{{batteries}}"
+        wx:key="id"
+        class="battery-item {{selectedBatteryId === item.id ? 'selected' : ''}}"
+        bindtap="selectBattery"
+        data-id="{{item.id}}"
+      >
+        <view class="battery-info">
+          <view class="battery-code">电池 #{{item.code}}</view>
+          <view class="battery-health">健康度 {{item.health}}%</view>
+        </view>
+        <view class="battery-charge">
+          <view class="charge-bar">
+            <view class="charge-fill" style="width: {{item.charge}}%"></view>
+          </view>
+          <text class="charge-text">{{item.charge}}%</text>
+        </view>
+        <view wx:if="{{selectedBatteryId === item.id}}" class="selected-icon">✓</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 预约时长 -->
+  <view class="duration-section">
+    <view class="section-title">预约时长</view>
+    <view class="duration-options">
+      <view
+        wx:for="{{durations}}"
+        wx:key="value"
+        class="duration-option {{selectedDuration === item.value ? 'selected' : ''}}"
+        bindtap="selectDuration"
+        data-value="{{item.value}}"
+      >
+        <text class="duration-label">{{item.label}}</text>
+        <text class="duration-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预约说明 -->
+  <view class="reservation-notice">
+    <view class="notice-title">预约说明</view>
+    <view class="notice-item">• 预约成功后，电池将为您保留{{selectedDuration}}分钟</view>
+    <view class="notice-item">• 超时未取消预约将影响信用分</view>
+    <view class="notice-item">• 到站后请在5分钟内完成换电</view>
+    <view class="notice-item">• 免费取消次数：本月剩余{{cancelCount}}次</view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="reservation-info">
+      <text class="info-label">预约保留至</text>
+      <text class="info-value">{{reserveUntil}}</text>
+    </view>
+    <button
+      class="confirm-btn {{!canConfirm ? 'disabled' : ''}}"
+      bindtap="confirmReservation"
+      disabled="{{!canConfirm}}"
+    >
+      确认预约
+    </button>
+  </view>
+</view>

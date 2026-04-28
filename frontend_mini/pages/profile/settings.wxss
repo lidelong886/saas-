@@ -1,0 +1,23 @@
+.container {
+  min-height: 100vh;
+  padding: var(--space-16);
+  background: #F0FDFA;
+  box-sizing: border-box;
+}
+.section {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 28rpx;
+  margin-bottom: var(--space-16);
+}
+.label { font-size: var(--text-base); color: #333; margin-bottom: 16rpx; display: block; }
+.input {
+  border: 1px solid #eee;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  font-size: var(--text-base);
+}
+.btn { margin-bottom: var(--radius-md); }
+.tip { font-size: var(--radius-md); color: #999; line-height: 1.5; }
+
+

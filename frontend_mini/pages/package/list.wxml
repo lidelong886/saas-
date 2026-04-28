@@ -1,0 +1,90 @@
+<view class="container">
+  <!-- 骑手专属入口卡片 -->
+  <view class="rider-entry-card" bindtap="onRiderPackageTap">
+    <view class="rider-card-content">
+      <view class="rider-card-left">
+        <text class="rider-card-title">骑手专属套餐</text>
+        <text class="rider-card-subtitle">高频换电用户专享优惠</text>
+        <view class="rider-card-features">
+          <text class="feature-item">无限次换电</text>
+          <text class="feature-item">超值折扣</text>
+        </view>
+      </view>
+      <view class="rider-card-right">
+        <text class="rider-card-arrow">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 协同过滤推荐套餐模块 -->
+  <view class="recommend-section" wx:if="{{recommendedPackages.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">✨ 为您推荐</text>
+      <text class="section-subtitle">基于与您相似用户的选择 (协同过滤)</text>
+    </view>
+    <scroll-view class="recommend-scroll" scroll-x>
+      <view class="recommend-card" wx:for="{{recommendedPackages}}" wx:key="id">
+        <view class="rec-header">
+          <text class="rec-name">{{item.name}}</text>
+        </view>
+        <view class="rec-price">{{item.priceText}}</view>
+        <text class="rec-desc">{{item.battery_model || '通用'}}适配</text>
+        <button class="rec-buy-btn" bindtap="onBuyTap" data-item="{{item}}">购买</button>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="section-header list-header" wx:if="{{packages.length > 0}}">
+    <text class="section-title">全部套餐</text>
+  </view>
+
+  <view class="package-list" wx:if="{{packages.length > 0}}">
+    <view class="package-card" wx:for="{{packages}}" wx:key="id">
+      <view class="card-header">
+        <view>
+          <text class="package-name">{{item.name}}</text>
+          <text class="package-type">{{item.packageTypeText}}</text>
+        </view>
+        <text class="package-price">{{item.priceText}}</text>
+      </view>
+
+      <view class="package-body">
+        <view class="meta-item">
+          <text class="meta-label">适配型号</text>
+          <text class="meta-value">{{item.battery_model || '通用'}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">套餐时长</text>
+          <text class="meta-value">{{item.durationText}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">押金</text>
+          <text class="meta-value">{{item.depositText}}</text>
+        </view>
+        <view class="meta-item">
+          <text class="meta-label">换电费</text>
+          <text class="meta-value">{{item.exchangeFeeText}}</text>
+        </view>
+      </view>
+
+      <text class="package-desc">{{item.description || '查看套餐详情与适用说明'}}</text>
+      <view class="package-actions">
+        <button class="buy-btn" bindtap="onBuyTap" data-item="{{item}}">立即购买</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{packages.length === 0 && recommendedPackages.length === 0 && !isLoading}}">
+    <text class="empty-icon">📦</text>
+    <text class="empty-text">暂无可用套餐</text>
+    <button class="empty-btn" bindtap="goToIndex">返回首页</button>
+  </view>
+
+  <view class="loading" wx:if="{{isLoading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="no-more" wx:if="{{!hasMore && packages.length > 0}}">
+    <text class="no-more-text">没有更多了</text>
+  </view>
+</view>

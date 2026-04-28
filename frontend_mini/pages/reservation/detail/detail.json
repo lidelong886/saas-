@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "预约详情",
+  "navigationBarBackgroundColor": "#1A1A1A",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#1A1A1A",
+  "usingComponents": {
+    "countdown": "/components/countdown/countdown",
+    "battery-status": "/components/battery-status/battery-status"
+  }
+}

@@ -1,0 +1,157 @@
+<!-- pages/station/list.wxml -->
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-box">
+      <icon type="search" size="16" color="#999"></icon>
+      <input
+        class="search-input"
+        placeholder="搜索站点名称或地址"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+      <view class="clear-btn" wx:if="{{searchKeyword}}" bindtap="onClearSearch">
+        <icon type="clear" size="16" color="#999"></icon>
+      </view>
+    </view>
+    <view class="filter-btn" bindtap="toggleFilters">
+      <icon type="filter" size="16" color="#666"></icon>
+      <text>筛选</text>
+    </view>
+  </view>
+
+  <!-- 筛选面板 -->
+  <view class="filter-panel {{showFilters ? 'show' : ''}}">
+    <view class="filter-section">
+      <text class="filter-title">排序方式</text>
+      <view class="filter-options">
+        <view
+          class="filter-option {{sortBy === 'distance' ? 'active' : ''}}"
+          data-sort="distance"
+          bindtap="onSortChange"
+        >
+          距离最近
+        </view>
+        <view
+          class="filter-option {{sortBy === 'available' ? 'active' : ''}}"
+          data-sort="available"
+          bindtap="onSortChange"
+        >
+          可用最多
+        </view>
+        <view
+          class="filter-option {{sortBy === 'name' ? 'active' : ''}}"
+          data-sort="name"
+          bindtap="onSortChange"
+        >
+          名称排序
+        </view>
+      </view>
+    </view>
+
+    <view class="filter-section">
+      <text class="filter-title">站点状态</text>
+      <view class="filter-options">
+        <view
+          class="filter-option {{filterStatus === 'all' ? 'active' : ''}}"
+          data-filter="all"
+          bindtap="onFilterChange"
+        >
+          全部
+        </view>
+        <view
+          class="filter-option {{filterStatus === 'active' ? 'active' : ''}}"
+          data-filter="active"
+          bindtap="onFilterChange"
+        >
+          正常运营
+        </view>
+        <view
+          class="filter-option {{filterStatus === 'maintenance' ? 'active' : ''}}"
+          data-filter="maintenance"
+          bindtap="onFilterChange"
+        >
+          维护中
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 更新时间提示 -->
+  <view class="update-bar" wx:if="{{lastUpdatedAt}}">
+    <text class="update-time">{{lastUpdatedAt}}</text>
+    <text class="update-hint">下拉刷新获取最新数据</text>
+  </view>
+
+  <!-- 站点列表 -->
+  <view class="station-list">
+    <view
+      class="station-item"
+      wx:for="{{filteredStations}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onStationTap"
+    >
+      <view class="station-header">
+        <view class="station-info">
+          <text class="station-name">{{item.name}}</text>
+          <text class="station-distance">{{item.distance}}km</text>
+        </view>
+        <view class="station-header-right">
+          <view class="station-health-tag health-{{item.health_status || 'good'}}">
+            <text>{{item.health_label || (item.status === 'active' ? '正常' : '维护')}}</text>
+          </view>
+          <view class="station-battery-count">
+            <text class="count-number">{{item.available_batteries || 0}}</text>
+            <text class="count-label">可换</text>
+          </view>
+        </view>
+      </view>
+
+      <text class="station-address">{{item.address}}</text>
+
+      <view class="station-stats">
+        <view class="stat-item">
+          <text class="stat-label">可用电池</text>
+          <text class="stat-value">{{item.available_batteries}}</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-label">总电池数</text>
+          <text class="stat-value">{{item.total_batteries}}</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-label">充电中</text>
+          <text class="stat-value">{{item.charging_batteries}}</text>
+        </view>
+      </view>
+
+      <view class="station-actions">
+        <button class="action-btn navigate" data-station="{{item}}" bindtap="onNavigateTap">
+          <icon type="location" size="14"></icon>
+          导航
+        </button>
+        <button class="action-btn detail">
+          查看详情
+        </button>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{filteredStations.length === 0 && !isLoading}}">
+      <icon type="info" size="48" color="#ccc"></icon>
+      <text class="empty-text">暂无站点数据</text>
+      <button class="refresh-btn" bindtap="onRefresh">刷新</button>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-more" wx:if="{{isLoading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 没有更多数据 -->
+    <view class="no-more" wx:if="{{!hasMore && !isLoading && filteredStations.length > 0}}">
+      <text class="no-more-text">没有更多站点了</text>
+    </view>
+  </view>
+</view>

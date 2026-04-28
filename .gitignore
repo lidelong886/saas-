@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables / local secrets
+.env
+.env.*
+!.env.example
+!*.env.example
+
+# IDEs
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Logs
+*.log
+*.txt
+!requirements.txt
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node.js (for frontend_admin)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+frontend_admin/dist/
+frontend_admin/.temp/
+
+# WeChat Mini Program
+frontend_mini/.git/
+frontend_mini/.gitignore
+
+# Docker
+*.pid
+
+# Claude Code
+.claude/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

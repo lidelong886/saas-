@@ -1,0 +1,67 @@
+.container {
+  min-height: 100vh;
+  padding: var(--space-16);
+  background: #F0FDFA;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 28rpx;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+
+.status-label,
+.label {
+  font-size: var(--text-base);
+  color: #333;
+}
+
+.status-value {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.status-verified {
+  color: #10b981;
+}
+
+.status-unverified,
+.status-pending,
+.status-rejected {
+  color: #f59e0b;
+}
+
+.field {
+  margin-bottom: var(--radius-md);
+}
+
+.input {
+  margin-top: 14rpx;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  font-size: var(--text-base);
+}
+
+.btn {
+  margin-top: var(--radius-sm);
+}
+
+.tip,
+.loading {
+  display: block;
+  margin-top: var(--radius-md);
+  font-size: var(--radius-md);
+  color: #999;
+  line-height: 1.6;
+}
+
+

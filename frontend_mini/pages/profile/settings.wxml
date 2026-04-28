@@ -1,0 +1,16 @@
+<view class="container">
+  <view class="section" bindtap="goToChangePassword">
+    <text class="label">修改密码</text>
+    <text class="arrow">></text>
+  </view>
+  <view class="section" bindtap="goToBindPhone">
+    <text class="label">绑定手机号</text>
+    <text class="arrow">></text>
+  </view>
+  <view class="section">
+    <text class="label">昵称</text>
+    <input class="input" value="{{nickname}}" placeholder="请输入昵称" bindinput="onNickInput" />
+  </view>
+  <button class="btn" type="primary" loading="{{loading}}" bindtap="onSave">保存</button>
+  <text class="tip">其他项可在管理后台维护；此处仅演示修改昵称。</text>
+</view>

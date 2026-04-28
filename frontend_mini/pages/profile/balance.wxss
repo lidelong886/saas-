@@ -1,0 +1,103 @@
+.container {
+  min-height: 100vh;
+  padding: var(--radius-md);
+  background: #F0FDFA;
+  box-sizing: border-box;
+}
+.card {
+  background: linear-gradient(135deg, #2d8cf0, #5cadff);
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: 40rpx var(--space-16);
+  margin-bottom: var(--radius-md);
+}
+.label { font-size: 26rpx; opacity: 0.9; display: block; }
+.amount { font-size: 56rpx; font-weight: 600; margin-top: var(--radius-sm); display: block; }
+.sub { font-size: var(--radius-md); opacity: 0.85; margin-top: var(--radius-sm); display: block; }
+.section {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 28rpx;
+  margin-bottom: var(--radius-md);
+}
+.section-title { font-size: 30rpx; font-weight: 600; margin-bottom: var(--radius-md); display: block; }
+.chips { display: flex; gap: 16rpx; margin-bottom: var(--radius-md); }
+.chip {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: var(--radius-sm);
+  background: #f0f0f0;
+  font-size: var(--text-base);
+}
+.chip.on { background: #e6f2ff; color: #2d8cf0; font-weight: 600; }
+.input {
+  border: 1px solid #eee;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  margin-bottom: var(--radius-md);
+  font-size: var(--text-base);
+}
+.btn { margin-top: 8rpx; }
+.empty { color: #999; font-size: 26rpx; padding: 16rpx 0; }
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--radius-md) 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.row-main { flex: 1; }
+.row-title { font-size: var(--text-base); display: block; }
+.row-sub { font-size: var(--radius-md); color: #999; margin-top: 6rpx; display: block; }
+.row-amt { font-size: var(--text-base); font-weight: 600; color: #2d8cf0; }
+.amt-expense { color: #ef4444; }
+.amt-income { color: #10b981; }
+
+/* ── 本周收支摘要 ────────────────────────────────────── */
+.cost-summary {
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 28rpx;
+  margin-bottom: var(--radius-md);
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+}
+
+.summary-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary-label {
+  font-size: var(--radius-md);
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.summary-value {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.summary-value.expense {
+  color: #ef4444;
+}
+
+.summary-value.income {
+  color: #10b981;
+}
+
+.summary-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background: #e5e7eb;
+  margin: 0 var(--radius-md);
+}
+
+

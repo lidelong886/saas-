@@ -1,0 +1,295 @@
+/* pages/map/map.wxss */
+.map-container {
+  height: 100vh;
+  position: relative;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+/* 覆盖在 map 上的 cover-view（样式能力有限，勿用复杂 flex） */
+.cover-search-wrap {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 72px;
+  height: 40px;
+  z-index: 100;
+}
+
+.search-box-cover {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 10px 16px;
+  height: 40px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.search-text-cover {
+  font-size: 14px;
+  color: var(--gray-700);
+  line-height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cover-fab {
+  position: absolute;
+  right: 12px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cover-fab-locate {
+  top: 72px;
+}
+
+.cover-fab-refresh {
+  top: 136px;
+}
+
+.fab-btn-cover {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background-color: #007aff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.fab-img-cover {
+  width: 26px;
+  height: 26px;
+}
+
+.fab-caption-cover {
+  font-size: 11px;
+  color: var(--gray-800);
+  line-height: 12px;
+}
+
+/* 隐私授权（盖在 map 上须用 cover-view） */
+.privacy-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  z-index: 10001;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.privacy-panel {
+  width: 80%;
+  max-width: 320px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.privacy-title {
+  font-size: 17px;
+  font-weight: bold;
+  color: var(--gray-900);
+  margin-bottom: 12px;
+  line-height: 24px;
+}
+
+.privacy-desc {
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 20px;
+  margin-bottom: 20px;
+}
+
+.privacy-agree-btn {
+  background-color: #0d9488;
+  color: #ffffff;
+  border-radius: 22px;
+  font-size: 16px;
+  margin-bottom: 12px;
+  border: none;
+}
+
+.privacy-reject {
+  font-size: 14px;
+  color: var(--gray-500);
+  text-align: center;
+  line-height: 22px;
+}
+
+/* 站点详情弹窗 */
+.station-detail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.station-detail.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.detail-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.detail-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.station-info {
+  margin-bottom: 24px;
+}
+
+.station-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.station-address {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.station-stats {
+  display: flex;
+  justify-content: space-around;
+  background: #F8FAFC;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  color: #007aff;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.action-btn {
+  flex: 1;
+  height: 44px;
+  border-radius: 22px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.action-btn.primary {
+  background: #007aff;
+  color: #fff;
+  border: none;
+}
+
+.action-btn.secondary {
+  background: #fff;
+  color: #007aff;
+  border: 1px solid #007aff;
+}
+
+/* 关闭按钮 */
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* 地图中心大头针 */
+.map-center-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin-top: -32px; /* 向上偏移以使尖端对准中心 */
+  margin-left: -16px;
+  z-index: 10;
+  pointer-events: none; /* 让事件穿透到地图 */
+}
+
+.pin-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.custom-callout {
+  border-radius: 16px;
+  padding: 4px 10px;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-callout .content {
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+

@@ -1,0 +1,122 @@
+<!-- 电池预约列表页面 -->
+<view class="reservation-list-page">
+  <!-- 顶部标签切换 -->
+  <view class="tabs">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="tab-item {{activeTab === item.key ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-key="{{item.key}}"
+    >
+      <text class="tab-label">{{item.label}}</text>
+      <view wx:if="{{activeTab === item.key}}" class="tab-indicator"></view>
+    </view>
+  </view>
+
+  <!-- 预约列表 -->
+  <scroll-view
+    scroll-y
+    class="reservation-list"
+    refresher-enabled
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onRefresh"
+    bindscrolltolower="onLoadMore"
+  >
+    <view wx:if="{{reservations.length > 0}}">
+      <view
+        wx:for="{{reservations}}"
+        wx:key="id"
+        class="reservation-item"
+        bindtap="goToDetail"
+        data-id="{{item.id}}"
+      >
+        <!-- 状态标签 -->
+        <view class="status-badge {{item.status}}">
+          <text wx:if="{{item.status === 'active'}}">进行中</text>
+          <text wx:if="{{item.status === 'completed'}}">已完成</text>
+          <text wx:if="{{item.status === 'cancelled'}}">已取消</text>
+          <text wx:if="{{item.status === 'expired'}}">已过期</text>
+        </view>
+
+        <!-- 站点信息 -->
+        <view class="item-header">
+          <view class="station-name">{{item.station.name}}</view>
+          <view class="station-distance">{{item.station.distance}}km</view>
+        </view>
+
+        <!-- 电池信息 -->
+        <view class="battery-info">
+          <view class="battery-code">#{{item.battery.code}}</view>
+          <view class="battery-charge">
+            <battery-status available="1" total="1"></battery-status>
+            <text class="charge-text">{{item.battery.charge}}%</text>
+          </view>
+        </view>
+
+        <!-- 时间信息 -->
+        <view class="time-info">
+          <view class="time-row">
+            <text class="time-label">预约时间</text>
+            <text class="time-value">{{item.reserved_at_formatted}}</text>
+          </view>
+          <view class="time-row">
+            <text class="time-label">
+              <text wx:if="{{item.status === 'active'}}">到期时间</text>
+              <text wx:elif="{{item.status === 'completed'}}">完成时间</text>
+              <text wx:else>结束时间</text>
+            </text>
+            <text class="time-value {{item.status === 'active' ? 'highlight' : ''}}">
+              {{item.status === 'active' ? item.expires_at_formatted : item.status === 'completed' ? item.completed_at_formatted : item.expires_at_formatted}}
+            </text>
+          </view>
+        </view>
+
+        <!-- 倒计时（仅活跃状态） -->
+        <view wx:if="{{item.status === 'active'}}" class="countdown-wrapper">
+          <countdown
+            endTime="{{item.expires_at}}"
+            totalDuration="{{item.duration * 60 * 1000}}"
+            label="剩余时间"
+            showProgress="{{true}}"
+          ></countdown>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view wx:if="{{item.status === 'active'}}" class="item-actions">
+          <button
+            class="action-btn cancel"
+            catchtap="cancelReservation"
+            data-id="{{item.id}}"
+          >
+            取消
+          </button>
+          <button
+            class="action-btn primary"
+            catchtap="goToStation"
+            data-station="{{item.station}}"
+          >
+            导航
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{!loading && reservations.length === 0}}" class="empty-state">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无预约记录</text>
+      <button class="empty-btn" bindtap="goToStationList">
+        去预约电池
+      </button>
+    </view>
+
+    <!-- 加载更多 -->
+    <view wx:if="{{hasMore}}" class="loading-more">
+      <text>加载中...</text>
+    </view>
+    <view wx:if="{{!hasMore && reservations.length > 0}}" class="no-more">
+      <text>没有更多了</text>
+    </view>
+  </scroll-view>
+</view>

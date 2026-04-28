@@ -1,0 +1,284 @@
+/* 电池预约创建页面 - 高效工业风 */
+.reservation-create-page {
+  min-height: 100vh;
+  background: #1A1A1A;
+  padding-bottom: 160rpx;
+}
+
+/* 页面头部 */
+.page-header {
+  padding: 40rpx var(--space-16) var(--space-16);
+  background: linear-gradient(180deg, #242424 0%, #1A1A1A 100%);
+}
+
+.header-title {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: var(--radius-sm);
+}
+
+.header-subtitle {
+  font-size: var(--text-base);
+  color: #8C8C8C;
+}
+
+/* 站点信息卡片 */
+.station-info-card {
+  margin: var(--radius-md) var(--space-16);
+  padding: var(--space-16);
+  background: #242424;
+  border-radius: var(--radius-md);
+  border: 2rpx solid rgba(0, 255, 136, 0.2);
+}
+
+.station-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.station-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.station-distance {
+  font-size: var(--text-base);
+  color: var(--success);
+  font-weight: 600;
+}
+
+.station-address {
+  font-size: 26rpx;
+  color: #8C8C8C;
+  margin-bottom: var(--radius-md);
+}
+
+.station-status {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.status-text {
+  font-size: var(--text-base);
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+/* 电池选择 */
+.battery-selection {
+  margin: var(--radius-md) var(--space-16);
+}
+
+.section-title {
+  font-size: var(--space-16);
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: var(--radius-md);
+}
+
+.battery-list {
+  max-height: 600rpx;
+}
+
+.battery-item {
+  position: relative;
+  padding: 28rpx;
+  background: #242424;
+  border-radius: var(--radius-sm);
+  border: 2rpx solid transparent;
+  margin-bottom: 16rpx;
+  transition: all var(--duration);
+}
+
+.battery-item.selected {
+  border-color: var(--success);
+  background: rgba(0, 255, 136, 0.05);
+}
+
+.battery-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.battery-code {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  font-family: 'SF Mono', monospace;
+}
+
+.battery-health {
+  font-size: 26rpx;
+  color: #8C8C8C;
+}
+
+.battery-charge {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.charge-bar {
+  flex: 1;
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.charge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success) 0%, #00CC6F 100%);
+  border-radius: 4rpx;
+  transition: width 0.3s;
+}
+
+.charge-text {
+  font-size: 26rpx;
+  color: var(--success);
+  font-weight: 600;
+  min-width: var(--btn-height);
+  text-align: right;
+}
+
+.selected-icon {
+  position: absolute;
+  top: 28rpx;
+  right: 28rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background: var(--success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--space-16);
+  color: #1A1A1A;
+  font-weight: 700;
+}
+
+/* 预约时长 */
+.duration-section {
+  margin: var(--radius-md) var(--space-16);
+}
+
+.duration-options {
+  display: flex;
+  gap: 16rpx;
+}
+
+.duration-option {
+  flex: 1;
+  padding: var(--radius-md) 16rpx;
+  background: #242424;
+  border-radius: var(--radius-sm);
+  border: 2rpx solid transparent;
+  text-align: center;
+  transition: all var(--duration);
+}
+
+.duration-option.selected {
+  border-color: var(--success);
+  background: rgba(0, 255, 136, 0.05);
+}
+
+.duration-label {
+  display: block;
+  font-size: var(--space-16);
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 8rpx;
+}
+
+.duration-desc {
+  display: block;
+  font-size: var(--radius-md);
+  color: #8C8C8C;
+}
+
+/* 预约说明 */
+.reservation-notice {
+  margin: var(--radius-md) var(--space-16);
+  padding: 28rpx;
+  background: rgba(255, 149, 0, 0.1);
+  border-radius: var(--radius-sm);
+  border: 2rpx solid rgba(255, 149, 0, 0.3);
+}
+
+.notice-title {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: #FF9500;
+  margin-bottom: 16rpx;
+}
+
+.notice-item {
+  font-size: 26rpx;
+  color: #D9D9D9;
+  line-height: 1.6;
+  margin-bottom: 8rpx;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--radius-md) var(--space-16);
+  padding-bottom: calc(var(--radius-md) + env(safe-area-inset-bottom));
+  background: #242424;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: var(--radius-md);
+}
+
+.reservation-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.info-label {
+  font-size: var(--radius-md);
+  color: #8C8C8C;
+}
+
+.info-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--success);
+  font-family: 'SF Mono', monospace;
+}
+
+.confirm-btn {
+  flex-shrink: 0;
+  width: 240rpx;
+  height: 88rpx;
+  background: linear-gradient(135deg, var(--success) 0%, #00CC6F 100%);
+  border-radius: var(--radius-sm);
+  font-size: var(--space-16);
+  font-weight: 700;
+  color: #1A1A1A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx var(--radius-md) rgba(0, 255, 136, 0.3);
+}
+
+.confirm-btn.disabled {
+  background: #3A3A3A;
+  color: #666666;
+  box-shadow: none;
+}
+
+

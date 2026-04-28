@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "mode-switcher": "/components/mode-switcher/mode-switcher"
+  }
+}

@@ -1,0 +1,66 @@
+<!-- pages/fault/report.wxml -->
+<view class="container">
+  <view class="section">
+    <view class="section-title">故障类型</view>
+    <view class="type-list">
+      <view
+        class="type-item {{selectedType === item.value ? 'active' : ''}}"
+        wx:for="{{faultTypes}}"
+        wx:key="value"
+        data-type="{{item.value}}"
+        bindtap="onSelectType"
+      >
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">故障描述 <text class="required">*</text></view>
+    <textarea
+      class="desc-input"
+      placeholder="请详细描述故障情况（至少10个字）"
+      maxlength="200"
+      value="{{description}}"
+      bindinput="onDescInput"
+    />
+    <view class="char-count">{{description.length}}/200</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">上传图片（选填，最多3张）</view>
+    <view class="image-list">
+      <view class="image-item" wx:for="{{images}}" wx:key="index">
+        <image src="{{item}}" mode="aspectFill" />
+        <view class="remove-btn" data-index="{{index}}" bindtap="onRemoveImage">x</view>
+      </view>
+      <view class="image-add" wx:if="{{images.length < 3}}" bindtap="onChooseImage">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section" wx:if="{{stationName}}">
+    <view class="section-title">关联站点</view>
+    <view class="station-tag">{{stationName}}</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">联系电话</view>
+    <input
+      class="phone-input"
+      type="number"
+      placeholder="请输入联系电话"
+      value="{{contactPhone}}"
+      bindinput="onPhoneInput"
+      maxlength="11"
+    />
+  </view>
+
+  <view class="bottom-bar">
+    <button class="submit-btn" bindtap="onSubmit" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : '提交报修'}}
+    </button>
+  </view>
+</view>

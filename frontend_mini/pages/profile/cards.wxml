@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="tabs">
+    <view class="tab {{activeTab === 'unused' ? 'active' : ''}}" bindtap="switchTab" data-tab="unused">待使用</view>
+    <view class="tab {{activeTab === 'active' ? 'active' : ''}}" bindtap="switchTab" data-tab="active">使用中</view>
+    <view class="tab {{activeTab === 'expired' ? 'active' : ''}}" bindtap="switchTab" data-tab="expired">已失效</view>
+  </view>
+
+  <view class="card-list" wx:if="{{cards.length > 0}}">
+    <view class="card-item {{item.status}}" wx:for="{{cards}}" wx:key="id">
+      <view class="card-header">
+        <view class="card-title">{{item.package_name}}</view>
+        <view class="card-status">{{item.statusText}}</view>
+      </view>
+      <view class="card-body">
+        <view class="card-meta">包含时长：{{item.total_hours ? item.total_hours + '小时' : '不限'}}</view>
+        <view class="card-meta" wx:if="{{item.activated_at}}">生效时间：{{item.activated_at}}</view>
+        <view class="card-meta" wx:if="{{item.expires_at}}">过期时间：{{item.expires_at}}</view>
+      </view>
+      <view class="card-footer" wx:if="{{item.status === 'unused'}}">
+        <button class="use-btn" bindtap="onUseCard" data-id="{{item.id}}" data-name="{{item.package_name}}">立即使用</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">🎟️</text>
+    <text class="empty-text">暂无相关卡券</text>
+    <button class="buy-btn" bindtap="goToPackages" wx:if="{{activeTab === 'unused'}}">去购买套餐</button>
+  </view>
+</view>

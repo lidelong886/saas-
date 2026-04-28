@@ -1,0 +1,15 @@
+<!-- 倒计时组件 -->
+<view class="countdown {{className}}">
+  <view class="countdown-label">{{label}}</view>
+  <view class="countdown-time">
+    <block wx:if="{{minutes > 0}}">
+      <text class="time-number">{{minutes}}</text>
+      <text class="time-unit">分</text>
+    </block>
+    <text class="time-number">{{seconds}}</text>
+    <text class="time-unit">秒</text>
+  </view>
+  <view wx:if="{{showProgress}}" class="countdown-progress">
+    <view class="progress-bar" style="width: {{progress}}%"></view>
+  </view>
+</view>

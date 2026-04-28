@@ -1,0 +1,135 @@
+<!--pages/station/detail.wxml-->
+<view class="container">
+  <view class="station-card" wx:if="{{station}}">
+    <view class="station-header">
+      <text class="station-name">{{station.name}}</text>
+      <view class="station-status status-{{station.status}}">
+        {{station.status === 'active' ? '营业中' : '维护中'}}
+      </view>
+    </view>
+
+    <view class="station-info">
+      <view class="info-row">
+        <text class="info-label">地址</text>
+        <text class="info-value">{{station.address}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">营业时间</text>
+        <text class="info-value">{{station.business_hours || '24小时'}}</text>
+      </view>
+    </view>
+
+    <!-- 实时电池资源面板 -->
+    <view class="resource-panel">
+      <view class="resource-title">实时电池资源</view>
+
+      <!-- 电压类型分类统计 -->
+      <view class="voltage-stats">
+        <view class="voltage-item">
+          <view class="voltage-header">
+            <text class="voltage-label">60V电池</text>
+            <text class="voltage-count">{{station.battery_60V.available || 0}}/{{station.battery_60V.total || 0}}</text>
+          </view>
+          <view class="voltage-bar">
+            <view class="voltage-fill" style="width: {{station.battery_60V.total > 0 ? (station.battery_60V.available / station.battery_60V.total * 100) : 0}}%"></view>
+          </view>
+        </view>
+        <view class="voltage-item">
+          <view class="voltage-header">
+            <text class="voltage-label">72V电池</text>
+            <text class="voltage-count">{{station.battery_72V.available || 0}}/{{station.battery_72V.total || 0}}</text>
+          </view>
+          <view class="voltage-bar">
+            <view class="voltage-fill" style="width: {{station.battery_72V.total > 0 ? (station.battery_72V.available / station.battery_72V.total * 100) : 0}}%"></view>
+          </view>
+        </view>
+      </view>
+
+      <view class="resource-stats">
+        <view class="resource-stat-item stat-available">
+          <text class="resource-stat-num">{{station.available_batteries || 0}}</text>
+          <text class="resource-stat-label">可用</text>
+        </view>
+        <view class="resource-stat-item stat-charging">
+          <text class="resource-stat-num">{{station.charging_batteries || 0}}</text>
+          <text class="resource-stat-label">充电中</text>
+        </view>
+        <view class="resource-stat-item stat-total">
+          <text class="resource-stat-num">{{station.total_batteries || 0}}</text>
+          <text class="resource-stat-label">总数</text>
+        </view>
+      </view>
+      <view class="resource-bar-container">
+        <view class="resource-bar-full">
+          <view class="resource-bar-seg seg-available" style="width: {{station.total_batteries > 0 ? (station.available_batteries / station.total_batteries * 100) : 0}}%"></view>
+          <view class="resource-bar-seg seg-charging" style="width: {{station.total_batteries > 0 ? (station.charging_batteries / station.total_batteries * 100) : 0}}%"></view>
+        </view>
+        <view class="resource-legend">
+          <view class="legend-item"><view class="legend-dot dot-available"></view><text>可用</text></view>
+          <view class="legend-item"><view class="legend-dot dot-charging"></view><text>充电中</text></view>
+          <view class="legend-item"><view class="legend-dot dot-other"></view><text>其他</text></view>
+        </view>
+      </view>
+      <text class="resource-hint" wx:if="{{station.available_batteries === 0}}">当前无可用电池，请稍后再来或选择其他站点</text>
+      <text class="resource-hint good" wx:elif="{{station.available_batteries >= 5}}">电池充足，可放心前往换电</text>
+    </view>
+
+    <button class="navigate-btn" bindtap="onNavigate">导航到这里</button>
+    <button class="link-btn" bindtap="onOpenBatteryList">查看本站点可租电池列表</button>
+  </view>
+
+  <!-- 换电柜：接口在站点详情里已返回 cabinets -->
+  <view class="cabinet-section" wx:if="{{station}}">
+    <text class="section-title">换电柜</text>
+    <block wx:if="{{station.cabinets && station.cabinets.length > 0}}">
+      <view class="cabinet-card" wx:for="{{station.cabinets}}" wx:key="id">
+        <view class="cabinet-head">
+          <text class="cabinet-name">{{item.name}}</text>
+          <text class="cabinet-badge">{{item.cabinet_code}}</text>
+        </view>
+        <view class="cabinet-row">
+          <text class="cabinet-stat">插槽：可用 {{item.available_slots}} / 共 {{item.total_slots}}</text>
+        </view>
+        <view class="cabinet-row">
+          <text class="cabinet-stat">在柜电池数：{{item.battery_count}}</text>
+          <text class="cabinet-stat muted">状态：{{item.status || '-'}}</text>
+        </view>
+      </view>
+    </block>
+    <view wx:else class="empty-hint">暂无换电柜数据（可在管理后台添加柜子）</view>
+  </view>
+
+  <view class="batteries-section">
+    <text class="section-title">站内电池明细</text>
+    <view class="battery-list" wx:if="{{batteries.length > 0}}">
+      <view class="battery-item" wx:for="{{batteries}}" wx:key="id" bindtap="onBatteryTap" data-id="{{item.id}}">
+        <view class="battery-left">
+          <text class="battery-code">{{item.battery_code}}</text>
+          <view class="battery-meta">
+            <text class="battery-status-tag status-tag-{{item.status}}">{{item.status_cn}}</text>
+            <text class="battery-voltage">{{item.voltage_type || '60V'}}</text>
+          </view>
+        </view>
+        <view class="battery-right">
+          <view class="power-bar-mini">
+            <view class="power-fill-mini {{item.power_level <= 20 ? 'power-low' : item.power_level >= 80 ? 'power-high' : 'power-mid'}}" style="width: {{item.power_level || 0}}%"></view>
+          </view>
+          <text class="battery-level">{{item.power_level != null ? item.power_level + '%' : '-'}}</text>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty-hint">暂无电池记录；若刚初始化数据，请重新运行后端 init_test_data</view>
+  </view>
+
+  <!-- 底部固定操作栏 -->
+  <view class="bottom-action-bar" wx:if="{{station}}">
+    <button class="action-bar-btn btn-report" bindtap="onFaultReport">
+      <text class="btn-icon">⚠</text>
+      <text class="btn-text">报修</text>
+    </button>
+    <button class="action-bar-btn btn-navigate" bindtap="onNavigate">
+      <text class="btn-icon">📍</text>
+      <text class="btn-text">一键导航</text>
+    </button>
+  </view>
+</view>

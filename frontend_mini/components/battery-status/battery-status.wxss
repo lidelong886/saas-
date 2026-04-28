@@ -1,0 +1,81 @@
+/* 电池状态指示灯组件样式 */
+.battery-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.battery-status__indicator {
+  width: 26rpx;
+  height: 26rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.battery-status__dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+}
+
+.battery-status__indicator.status-available {
+  background: rgba(34, 197, 94, 0.14);
+}
+
+.battery-status__indicator.status-available .battery-status__dot {
+  background: var(--success);
+  box-shadow: 0 0 12rpx rgba(34, 197, 94, 0.38);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.battery-status__indicator.status-low {
+  background: rgba(250, 204, 21, 0.18);
+}
+
+.battery-status__indicator.status-low .battery-status__dot {
+  background: var(--warning);
+  box-shadow: 0 0 12rpx rgba(250, 204, 21, 0.42);
+  animation: blink 1s ease-in-out infinite;
+}
+
+.battery-status__indicator.status-empty {
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.battery-status__indicator.status-empty .battery-status__dot {
+  background: var(--danger);
+  box-shadow: 0 0 12rpx rgba(239, 68, 68, 0.36);
+}
+
+.battery-status__info {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+}
+
+.battery-status__label {
+  font-size: 28rpx;
+  color: #64748B;
+}
+
+.battery-status__count {
+  font-family: 'DIN Alternate', 'SF Mono', monospace;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.12); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+

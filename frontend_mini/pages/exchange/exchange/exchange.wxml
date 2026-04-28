@@ -1,0 +1,302 @@
+<view class="exchange-page">
+  <!-- 顶部进度条（step > 0 时显示） -->
+  <view class="step-bar" wx:if="{{step > 0}}">
+    <view class="step-item {{step >= 1 ? 'active' : ''}}">
+      <view class="step-dot">1</view>
+      <text class="step-text">选择站点</text>
+    </view>
+    <view class="step-line {{step >= 2 ? 'active' : ''}}"></view>
+    <view class="step-item {{step >= 2 ? 'active' : ''}}">
+      <view class="step-dot">2</view>
+      <text class="step-text">选择电池</text>
+    </view>
+    <view class="step-line {{step >= 3 ? 'active' : ''}}"></view>
+    <view class="step-item {{step >= 3 ? 'active' : ''}}">
+      <view class="step-dot">3</view>
+      <text class="step-text">确认换电</text>
+    </view>
+  </view>
+
+  <!-- Step 0：无电池状态 → 快速租用 -->
+  <view class="step-content" wx:if="{{step === 0}}">
+    <!-- 欢迎引导卡片 -->
+    <view class="no-battery-hero">
+      <text class="hero-icon">🔋</text>
+      <text class="hero-title">还没有在租电池？</text>
+      <text class="hero-subtitle">一键租用，满电出发</text>
+    </view>
+
+    <!-- 无电池警告提示 -->
+    <view class="exchange-warning-card">
+      <text class="exchange-warning-icon">!</text>
+      <text class="exchange-warning-text">当前没有在租电池，无法进行换电操作。点击下方按钮直接租用电池。</text>
+    </view>
+
+    <!-- 附近可用电池（可直接租用） -->
+    <view class="section-title">附近可用电池</view>
+
+    <view class="loading-state" wx:if="{{stationLoading}}">
+      <text>加载附近电池...</text>
+    </view>
+
+    <view class="empty-state" wx:elif="{{error && stations.length === 0}}">
+      <text class="empty-icon">📍</text>
+      <text class="empty-text">{{error || '附近暂无可用电池'}}</text>
+      <button class="retry-btn" bindtap="initData">重新加载</button>
+    </view>
+
+    <!-- 站点列表（可直接租用） -->
+    <view class="station-list" wx:else>
+      <view
+        class="station-card {{recommendedStation && recommendedStation.id === item.id ? 'recommended' : ''}}"
+        wx:for="{{stations}}"
+        wx:key="id"
+        bindtap="onStationSelectForRent"
+        data-station="{{item}}"
+      >
+        <view class="station-info">
+          <view class="station-name-row">
+            <text class="station-name">{{item.name}}</text>
+            <text class="recommend-badge" wx:if="{{recommendedStation && recommendedStation.id === item.id}}">推荐</text>
+          </view>
+          <view class="station-address">{{item.address || '暂无地址'}}</view>
+          <!-- 电池资源条 -->
+          <view class="resource-bar-wrap">
+            <view class="resource-bar">
+              <view class="resource-fill available-fill" style="width: {{item.total_batteries > 0 ? (item.available_batteries / item.total_batteries * 100) : 0}}%"></view>
+            </view>
+            <text class="resource-text">可用 {{item.available_batteries || 0}}/{{item.total_batteries || 0}}</text>
+          </view>
+          <view class="station-meta">
+            <text class="meta-tag available">🟢 {{item.available_batteries || 0}} 台可租</text>
+            <text class="meta-tag charging" wx:if="{{item.charging_batteries}}">⚡ {{item.charging_batteries}} 充电中</text>
+            <text class="meta-tag distance" wx:if="{{item.distance}}">{{item.distance}}m</text>
+          </view>
+        </view>
+        <view class="station-arrow">›</view>
+      </view>
+
+      <view class="no-more" wx:if="{{stations.length > 0}}">
+        <text>附近共 {{stations.length}} 个站点</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤1：选择站点（换电流程） -->
+  <view class="step-content" wx:if="{{step === 1}}">
+    <view class="section-title">选择换电站点</view>
+
+    <!-- 电量预估预警卡片 -->
+    <view class="insight-card insight-{{batteryInsight.alertLevel}}" wx:if="{{batteryInsight}}">
+      <view class="insight-top">
+        <view class="insight-left">
+          <text class="insight-power">{{batteryInsight.powerLevel}}%</text>
+          <text class="insight-range">约 {{batteryInsight.estimatedRangeKm}} km / {{batteryInsight.estimatedMinutes}} 分钟</text>
+        </view>
+        <text class="insight-badge">{{batteryInsight.alertTag}}</text>
+      </view>
+      <text class="insight-tip">{{batteryInsight.alertText}}</text>
+    </view>
+
+    <!-- 智能推荐站点 -->
+    <view class="recommend-card" wx:if="{{recommendedStation}}" bindtap="goToRecommended">
+      <view class="recommend-header">
+        <text class="recommend-label">智能推荐</text>
+        <text class="recommend-reason">综合距离与可用电池最优</text>
+      </view>
+      <view class="recommend-body">
+        <view class="recommend-info">
+          <text class="recommend-name">{{recommendedStation.name}}</text>
+          <view class="recommend-meta">
+            <text class="meta-tag available">可用 {{recommendedStation.available_batteries}} 台</text>
+            <text class="meta-tag distance" wx:if="{{recommendedStation.distance}}">{{recommendedStation.distance}}m</text>
+          </view>
+        </view>
+        <text class="recommend-go">前往</text>
+      </view>
+    </view>
+
+    <!-- 当前租用电池提示 -->
+    <view class="current-battery-tip" wx:if="{{currentBattery}}">
+      <text class="tip-icon">🔋</text>
+      <text class="tip-text">当前租用：{{currentBattery.battery_code}}</text>
+    </view>
+
+    <view class="exchange-warning-card" wx:if="{{exchangeError}}">
+      <text class="exchange-warning-icon">!</text>
+      <text class="exchange-warning-text">{{exchangeError}}</text>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{stationLoading}}">
+      <text>加载附近站点...</text>
+    </view>
+
+    <!-- 错误状态 -->
+    <view class="empty-state" wx:elif="{{error}}">
+      <text class="empty-icon">📍</text>
+      <text class="empty-text">{{error}}</text>
+      <button class="retry-btn" bindtap="initData">重新加载</button>
+    </view>
+
+    <!-- 站点列表（增强资源展示） -->
+    <view class="station-list" wx:else>
+      <view
+        class="station-card {{recommendedStation.id === item.id ? 'recommended' : ''}}"
+        wx:for="{{stations}}"
+        wx:key="id"
+        bindtap="onStationSelect"
+        data-station="{{item}}"
+      >
+        <view class="station-info">
+          <view class="station-name-row">
+            <text class="station-name">{{item.name}}</text>
+            <text class="recommend-badge" wx:if="{{recommendedStation.id === item.id}}">推荐</text>
+          </view>
+          <view class="station-address">{{item.address || '暂无地址'}}</view>
+          <!-- 电池资源条 -->
+          <view class="resource-bar-wrap">
+            <view class="resource-bar">
+              <view class="resource-fill available-fill" style="width: {{item.total_batteries > 0 ? (item.available_batteries / item.total_batteries * 100) : 0}}%"></view>
+            </view>
+            <text class="resource-text">可用 {{item.available_batteries || 0}}/{{item.total_batteries || 0}}</text>
+          </view>
+          <view class="station-meta">
+            <text class="meta-tag available">🟢 {{item.available_batteries || 0}} 台可换</text>
+            <text class="meta-tag charging" wx:if="{{item.charging_batteries}}">⚡ {{item.charging_batteries}} 充电中</text>
+            <text class="meta-tag distance" wx:if="{{item.distance}}">{{item.distance}}m</text>
+          </view>
+        </view>
+        <view class="station-arrow">›</view>
+      </view>
+
+      <view class="no-more" wx:if="{{stations.length > 0}}">
+        <text>附近共 {{stations.length}} 个站点</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤2：选择电池 -->
+  <view class="step-content" wx:if="{{step === 2}}">
+    <view class="section-title">选择新电池</view>
+
+    <!-- 已选站点 -->
+    <view class="selected-station-bar" wx:if="{{selectedStation}}">
+      <text class="bar-label">站点：</text>
+      <text class="bar-value">{{selectedStation.name}}</text>
+    </view>
+
+    <!-- 当前电池提示 -->
+    <view class="current-battery-tip highlight" wx:if="{{currentBattery}}">
+      <text class="tip-icon">↩️</text>
+      <text class="tip-text">交回：{{currentBattery.battery_code}}</text>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{batteryLoading}}">
+      <text>加载电池列表...</text>
+    </view>
+
+    <!-- 错误状态 -->
+    <view class="empty-state" wx:elif="{{error}}">
+      <text class="empty-icon">🔋</text>
+      <text class="empty-text">{{error}}</text>
+      <button class="retry-btn" bindtap="onRefreshBatteries">刷新</button>
+    </view>
+
+    <!-- 电池列表 -->
+    <view class="battery-list" wx:else>
+      <view
+        class="battery-card {{selectedBattery.id === item.id ? 'selected' : ''}}"
+        wx:for="{{availableBatteries}}"
+        wx:key="id"
+        bindtap="onBatterySelect"
+        data-battery="{{item}}"
+      >
+        <view class="battery-info">
+          <view class="battery-code">{{item.battery_code}}</view>
+          <view class="battery-meta">
+            <text class="meta-tag power">⚡ {{item.power_level || 0}}%</text>
+            <text class="meta-tag type">{{item.battery_type === 'lithium_ion' ? '锂电池' : item.battery_type}}</text>
+            <text class="meta-tag model">{{item.model || '标准版'}}</text>
+          </view>
+        </view>
+        <view class="battery-select-icon {{selectedBattery.id === item.id ? 'checked' : ''}}">
+          <text wx:if="{{selectedBattery.id === item.id}}">✓</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤3：确认换电 -->
+  <view class="step-content" wx:if="{{step === 3}}">
+    <view class="section-title">确认换电信息</view>
+
+    <!-- 换电详情卡 -->
+    <view class="confirm-card">
+      <view class="confirm-row">
+        <view class="confirm-label">交回电池</view>
+        <view class="confirm-value old">{{currentBattery ? currentBattery.battery_code : '-'}}</view>
+      </view>
+      <view class="confirm-arrow">↓</view>
+      <view class="confirm-row">
+        <view class="confirm-label">领取电池</view>
+        <view class="confirm-value new">{{selectedBattery ? selectedBattery.battery_code : '-'}}</view>
+      </view>
+      <view class="confirm-divider"></view>
+      <view class="confirm-row">
+        <view class="confirm-label">换电站点</view>
+        <view class="confirm-value">{{selectedStation ? selectedStation.name : '-'}}</view>
+      </view>
+      <view class="confirm-row" wx:if="{{selectedBattery.power_level}}">
+        <view class="confirm-label">新电池电量</view>
+        <view class="confirm-value">⚡ {{selectedBattery.power_level}}%</view>
+      </view>
+    </view>
+
+    <!-- 费用说明 -->
+    <view class="fee-note">
+      <text class="fee-icon">💡</text>
+      <text class="fee-text">换电费用将在余额中扣除，如押金未到期将自动抵扣</text>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <!-- Step 0：无电池状态 → 显示快速租用按钮 -->
+    <button
+      class="confirm-btn {{rentConfirming ? 'loading' : ''}}"
+      bindtap="onQuickRent"
+      wx:if="{{step === 0}}"
+      disabled="{{rentConfirming}}"
+    >
+      <view class="confirm-btn-inner">
+        <text class="confirm-btn-icon">⚡</text>
+        <text class="confirm-btn-text">{{rentConfirming ? '租用中...' : '快速租用电池'}}</text>
+      </view>
+    </button>
+
+    <!-- Step 1/2：有电池状态 → 显示直接归还按钮 -->
+    <button
+      class="back-btn"
+      bindtap="onDirectReturn"
+      wx:if="{{step === 1 && canExchange}}"
+    >直接归还</button>
+
+    <!-- Step 2/3：返回上步 -->
+    <button class="back-btn" bindtap="onBackStep" wx:if="{{step > 1}}">返回上步</button>
+
+    <!-- Step 3：确认换电 -->
+    <button
+      class="confirm-btn {{step < 3 ? 'disabled' : ''}} {{confirming ? 'loading' : ''}}"
+      bindtap="onConfirmExchange"
+      wx:if="{{step === 3}}"
+      disabled="{{confirming || !selectedBattery || !canExchange}}"
+    >
+      <view class="confirm-btn-inner">
+        <text class="confirm-btn-icon">↻</text>
+        <text class="confirm-btn-text">{{confirming ? '换电中...' : '立即换电'}}</text>
+      </view>
+    </button>
+  </view>
+</view>

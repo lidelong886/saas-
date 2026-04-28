@@ -1,0 +1,16 @@
+<view class="container">
+  <view class="field">
+    <text class="label">租用时长（小时）</text>
+    <slider min="1" max="168" step="1" value="{{hours}}" show-value bindchange="onHoursChange" />
+  </view>
+  <view class="field">
+    <text class="label">订单类型</text>
+    <picker mode="selector" range="{{types}}" range-key="label" value="{{typeIndex}}" bindchange="onTypeChange">
+      <view class="picker">{{types[typeIndex].label}}</view>
+    </picker>
+  </view>
+  <text class="sub">电池编号：{{batteryId || '-'}}</text>
+  <text class="sub">套餐编号：{{packageId || '-'}}</text>
+  <text class="sub" wx:if="{{packageId}}">已从套餐详情进入，可直接生成套餐订单</text>
+  <button type="primary" loading="{{loading}}" bindtap="onSubmit">创建订单</button>
+</view>

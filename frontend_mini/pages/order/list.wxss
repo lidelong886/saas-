@@ -1,0 +1,258 @@
+/* pages/order/list.wxss */
+.container {
+  background-color: #F8FAFC;
+  min-height: 100vh;
+  padding-bottom: var(--space-16);
+}
+
+/* 标签栏 */
+.tabs {
+  display: flex;
+  background-color: white;
+  padding: 0 16rpx;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2rpx 8rpx var(--shadow-sm);
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: var(--radius-md) 0;
+  position: relative;
+}
+
+.tab-label {
+  font-size: var(--text-base);
+  color: #666;
+}
+
+.tab-item.active .tab-label {
+  color: #07c160;
+  font-weight: bold;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background-color: #07c160;
+  border-radius: 2rpx;
+}
+
+/* 订单列表 */
+.order-list {
+  padding: 16rpx;
+}
+
+.order-card {
+  background-color: white;
+  border-radius: var(--radius-sm);
+  padding: var(--radius-md);
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx var(--shadow-md);
+}
+
+/* 订单头部 */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.order-number {
+  font-size: var(--radius-md);
+  color: #999;
+}
+
+.order-status {
+  padding: 4rpx var(--radius-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--radius-md);
+  color: white;
+}
+
+.status-pending {
+  background-color: #faad14;
+}
+
+.status-paid {
+  background-color: #1890ff;
+}
+
+.status-in_use {
+  background-color: #52c41a;
+}
+
+.status-completed {
+  background-color: #d9d9d9;
+  color: #666;
+}
+
+.status-cancelled {
+  background-color: #ff4d4f;
+}
+
+/* 订单内容 */
+.order-content {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.order-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.order-type {
+  font-size: var(--space-16);
+  font-weight: bold;
+  color: #333;
+}
+
+.order-battery,
+.order-station {
+  font-size: var(--radius-md);
+  color: #666;
+}
+
+.order-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.price-label {
+  font-size: var(--radius-md);
+  color: #999;
+  margin-bottom: 4rpx;
+}
+
+.price-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #ff4d4f;
+}
+
+/* 订单时间 */
+.order-time {
+  display: flex;
+  gap: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.time-label {
+  font-size: var(--radius-md);
+  color: #999;
+}
+
+.time-value {
+  font-size: var(--radius-md);
+  color: #666;
+}
+
+/* 订单操作 */
+.order-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.action-btn {
+  min-height: 72rpx;
+  padding: 0 30rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancel-btn {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.pay-btn {
+  background: var(--brand-gradient);
+  color: white;
+  box-shadow: 0 8rpx 20rpx rgba(20, 184, 166, 0.24);
+}
+
+.review-btn {
+  background-color: var(--primary);
+  color: white;
+  box-shadow: 0 8rpx 20rpx rgba(20, 184, 166, 0.18);
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 112rpx 0;
+}
+
+.empty-icon {
+  font-size: 112rpx;
+  margin-bottom: var(--radius-md);
+}
+
+.empty-text {
+  font-size: var(--text-base);
+  color: #999;
+  margin-bottom: var(--space-16);
+}
+
+.empty-btn {
+  background: var(--brand-gradient);
+  color: white;
+  border-radius: 999rpx;
+  padding: 0 56rpx;
+  min-height: 84rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  border: none;
+  box-shadow: 0 10rpx 24rpx rgba(20, 184, 166, 0.24);
+}
+
+/* 加载状态 */
+.loading {
+  text-align: center;
+  padding: var(--space-16) 0;
+}
+
+.loading-text {
+  font-size: var(--text-base);
+  color: #999;
+}
+
+/* 没有更多 */
+.no-more {
+  text-align: center;
+  padding: var(--space-16) 0;
+}
+
+.no-more-text {
+  font-size: var(--radius-md);
+  color: #ccc;
+}
+
+

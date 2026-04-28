@@ -1,0 +1,170 @@
+<view class="pay-page">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <view class="header-title">确认支付</view>
+  </view>
+
+  <!-- 订单信息卡片 -->
+  <view class="order-card" wx:if="{{order}}">
+    <view class="order-title">订单信息</view>
+    <view class="order-info-row">
+      <text class="label">订单号</text>
+      <text class="value order-no">{{order.order_no}}</text>
+    </view>
+    <view class="order-info-row">
+      <text class="label">订单类型</text>
+      <text class="value">{{typeText}}</text>
+    </view>
+    <view class="order-info-row" wx:if="{{order.battery_model}}">
+      <text class="label">电池型号</text>
+      <text class="value">{{order.battery_model}}</text>
+    </view>
+    <view class="order-info-row" wx:if="{{order.station_name}}">
+      <text class="label">站点</text>
+      <text class="value station-name">{{order.station_name}}</text>
+    </view>
+    <view class="order-info-row" wx:if="{{order.rental_hours}}">
+      <text class="label">租借时长</text>
+      <text class="value">{{order.rental_hours}} 小时</text>
+    </view>
+  </view>
+
+  <!-- 金额卡片 -->
+  <view class="amount-card">
+    <view class="amount-label">支付金额</view>
+    <view class="amount-value">
+      <text class="currency">¥</text>
+      <text class="money">{{orderAmountFixed}}</text>
+    </view>
+    <view class="amount-breakdown" wx:if="{{order}}">
+      <view class="breakdown-item" wx:if="{{order.rental_fee > 0}}">
+        <text>租金</text>
+        <text>¥{{order.rental_fee.toFixed(2)}}</text>
+      </view>
+      <view class="breakdown-item" wx:if="{{order.deposit_fee > 0}}">
+        <text>押金</text>
+        <text>¥{{order.deposit_fee.toFixed(2)}}</text>
+      </view>
+      <view class="breakdown-item" wx:if="{{order.exchange_fee > 0}}">
+        <text>换电费</text>
+        <text>¥{{order.exchange_fee.toFixed(2)}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 余额提示 -->
+  <view class="balance-tip" wx:if="{{balanceEnough}}">
+    <text class="tip-icon">💡</text>
+    <text class="tip-text">您的余额（¥{{userBalanceFixed}}）足够支付此订单</text>
+  </view>
+  <view class="balance-tip warning" wx:elif="{{userBalance > 0 && !balanceEnough}}">
+    <text class="tip-icon">⚠️</text>
+    <text class="tip-text">余额不足，还需 ¥{{needMoreFixed}}，可使用微信支付补差价</text>
+  </view>
+
+  <!-- 支付方式 -->
+  <view class="payment-section">
+    <view class="section-title">选择支付方式</view>
+
+    <!-- 微信支付 -->
+    <view
+      class="payment-item {{selectedMethod === 'wechat' ? 'selected' : ''}}"
+      bindtap="selectPayment"
+      data-method="wechat"
+    >
+      <view class="item-left">
+        <view class="pay-icon wechat-icon">微</view>
+        <view class="item-info">
+          <view class="item-name">微信支付</view>
+          <view class="item-desc">推荐</view>
+        </view>
+      </view>
+      <view class="item-right">
+        <view class="radio {{selectedMethod === 'wechat' ? 'radio-checked' : ''}}"></view>
+      </view>
+    </view>
+
+    <!-- 支付宝 -->
+    <view
+      class="payment-item {{selectedMethod === 'alipay' ? 'selected' : ''}}"
+      bindtap="selectPayment"
+      data-method="alipay"
+    >
+      <view class="item-left">
+        <view class="pay-icon alipay-icon">支</view>
+        <view class="item-info">
+          <view class="item-name">支付宝</view>
+          <view class="item-desc">安全快速</view>
+        </view>
+      </view>
+      <view class="item-right">
+        <view class="radio {{selectedMethod === 'alipay' ? 'radio-checked' : ''}}"></view>
+      </view>
+    </view>
+
+    <!-- 余额支付 -->
+    <view
+      class="payment-item balance-item {{selectedMethod === 'balance' ? 'selected' : ''}} {{!balanceEnough ? 'balance-disabled' : ''}}"
+      bindtap="{{balanceEnough ? 'selectPayment' : ''}}"
+      data-method="balance"
+    >
+      <view class="item-left">
+        <view class="pay-icon balance-icon">¥</view>
+        <view class="item-info">
+          <view class="item-name">余额支付</view>
+          <view class="item-desc">当前余额 ¥{{userBalanceFixed}}{{balanceEnough ? '（充足）' : '（不足）'}}</view>
+        </view>
+      </view>
+      <view class="item-right">
+        <view class="radio {{selectedMethod === 'balance' ? 'radio-checked' : ''}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 安全提示 -->
+  <view class="security-tip">
+    <text>🔒 支付安全由微信支付/支付宝提供保障</text>
+  </view>
+
+  <!-- 底部固定栏 -->
+  <view class="bottom-bar">
+    <view class="total-info" wx:if="{{order}}">
+      <text class="total-label">合计</text>
+      <text class="total-amount">¥{{orderAmountFixed}}</text>
+    </view>
+    <button
+      class="pay-btn {{paying ? 'loading' : ''}}"
+      bindtap="submitPayment"
+      disabled="{{paying || !order}}"
+    >
+      {{paying ? '支付中...' : '确认支付 ¥' + orderAmountFixed}}
+    </button>
+  </view>
+
+  <!-- 支付结果弹窗 -->
+  <view class="result-modal {{showResult ? 'modal-show' : ''}}" wx:if="{{showResult}}">
+    <view class="result-overlay" bindtap="closeResult"></view>
+    <view class="result-card">
+      <view class="result-icon {{payResult === 'success' ? 'success' : 'fail'}}">
+        <text wx:if="{{payResult === 'success'}}">✓</text>
+        <text wx:else>✗</text>
+      </view>
+      <view class="result-title">{{payResult === 'success' ? '支付成功' : '支付失败'}}</view>
+      <view class="result-message" wx:if="{{payResult === 'success'}}">
+        您的订单已创建成功，电池已锁定，请按时归还
+      </view>
+      <view class="result-message" wx:else>{{payError || '请稍后重试'}}</view>
+      <view class="result-actions">
+        <button
+          class="result-btn primary"
+          bindtap="goToOrder"
+          wx:if="{{payResult === 'success'}}"
+        >查看订单</button>
+        <button
+          class="result-btn {{payResult !== 'success' ? 'primary' : ''}}"
+          bindtap="retryPay"
+        >{{payResult === 'success' ? '返回首页' : '重试支付'}}</button>
+      </view>
+    </view>
+  </view>
+</view>

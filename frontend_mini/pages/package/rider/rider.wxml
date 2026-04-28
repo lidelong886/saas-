@@ -1,0 +1,59 @@
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">骑手专属套餐</text>
+    <text class="page-subtitle">高频换电用户专享优惠</text>
+  </view>
+
+  <view class="package-list" wx:if="{{packages.length > 0}}">
+    <view class="package-card {{item.recommended ? 'recommended' : ''}}" wx:for="{{packages}}" wx:key="id">
+      <view class="recommend-badge" wx:if="{{item.recommended}}">
+        <text class="badge-text">最划算</text>
+      </view>
+
+      <view class="package-header">
+        <text class="package-name">{{item.name}}</text>
+        <text class="package-duration">{{item.duration_days}}天</text>
+      </view>
+
+      <view class="price-section">
+        <view class="price-main">
+          <text class="price-symbol">¥</text>
+          <text class="price-value">{{item.price}}</text>
+        </view>
+        <view class="price-original" wx:if="{{item.original_price}}">
+          <text class="original-price">¥{{item.original_price}}</text>
+          <text class="discount-tag">省¥{{item.original_price - item.price}}</text>
+        </view>
+      </view>
+
+      <view class="feature-tag">
+        <text class="tag-icon">∞</text>
+        <text class="tag-text">无限次换电</text>
+      </view>
+
+      <view class="package-desc">
+        <text>{{item.description}}</text>
+      </view>
+
+      <button class="buy-btn" bindtap="onBuyPackage" data-item="{{item}}">立即购买</button>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{packages.length === 0 && !isLoading}}">
+    <text class="empty-icon">📦</text>
+    <text class="empty-text">暂无骑手套餐</text>
+  </view>
+
+  <view class="loading" wx:if="{{isLoading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="bottom-notice">
+    <view class="notice-title">适用人群</view>
+    <view class="notice-content">
+      <text>• 外卖骑手、快递员等高频换电用户</text>
+      <text>• 每日换电需求2次以上的用户</text>
+      <text>• 需要稳定电池供应的配送从业者</text>
+    </view>
+  </view>
+</view>

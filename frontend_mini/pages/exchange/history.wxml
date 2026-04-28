@@ -1,0 +1,54 @@
+<view class="container">
+  <view class="record-list" wx:if="{{records.length > 0}}">
+    <view class="record-card" wx:for="{{records}}" wx:key="recordNo">
+      <view class="record-header">
+        <text class="record-number">记录号: {{item.recordNo}}</text>
+        <view class="record-status status-{{item.status}}">{{item.statusText}}</view>
+      </view>
+
+      <view class="record-body">
+        <view class="record-row">
+          <text class="label">换电站点</text>
+          <text class="value">{{item.stationName}}</text>
+        </view>
+        <view class="record-row">
+          <text class="label">柜机</text>
+          <text class="value">{{item.cabinetName}}</text>
+        </view>
+        <view class="record-row batteries">
+          <view class="battery-block">
+            <text class="label">交回电池</text>
+            <text class="value emphasis">{{item.oldBatteryCode}}</text>
+          </view>
+          <text class="swap-arrow">→</text>
+          <view class="battery-block align-right">
+            <text class="label">领取电池</text>
+            <text class="value emphasis">{{item.newBatteryCode}}</text>
+          </view>
+        </view>
+        <view class="record-row">
+          <text class="label">换电费用</text>
+          <text class="value fee">{{item.exchangeFeeText}}</text>
+        </view>
+        <view class="record-row">
+          <text class="label">换电时间</text>
+          <text class="value">{{item.exchangeTimeText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">🔋</text>
+    <text class="empty-text">暂无换电记录</text>
+    <button class="empty-btn" bindtap="goToIndex">去换电</button>
+  </view>
+
+  <view class="loading" wx:if="{{isLoading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="no-more" wx:if="{{!hasMore && records.length > 0}}">
+    <text class="no-more-text">没有更多了</text>
+  </view>
+</view>

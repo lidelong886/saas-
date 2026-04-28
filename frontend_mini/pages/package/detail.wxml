@@ -1,0 +1,40 @@
+<view class="container" wx:if="{{packageInfo}}">
+  <view class="hero-card">
+    <text class="package-name">{{packageInfo.name}}</text>
+    <text class="package-type">{{packageInfo.packageTypeText}}</text>
+    <text class="package-price">{{packageInfo.priceText}}</text>
+    <text class="package-desc">{{packageInfo.description || '该套餐适用于平台租电/换电业务，可在下单页进一步确认。'}}</text>
+  </view>
+
+  <view class="detail-card">
+    <view class="detail-row">
+      <text class="label">适配电池型号</text>
+      <text class="value">{{packageInfo.battery_model || '通用型号'}}</text>
+    </view>
+    <view class="detail-row">
+      <text class="label">套餐时长</text>
+      <text class="value">{{packageInfo.durationText}}</text>
+    </view>
+    <view class="detail-row">
+      <text class="label">押金</text>
+      <text class="value">{{packageInfo.depositText}}</text>
+    </view>
+    <view class="detail-row">
+      <text class="label">换电费</text>
+      <text class="value">{{packageInfo.exchangeFeeText}}</text>
+    </view>
+    <view class="detail-row">
+      <text class="label">套餐状态</text>
+      <text class="value {{packageInfo.is_active ? 'active' : 'inactive'}}">{{packageInfo.is_active ? '已启用' : '未启用'}}</text>
+    </view>
+  </view>
+
+  <view class="tips-card">
+    <text class="tips-title">使用说明</text>
+    <text class="tips-text">1. 租用套餐下单后可进入订单支付。\n2. 换电套餐适合已有在租电池用户。\n3. 购买套餐当前仅展示信息，具体办理请联系运营人员。</text>
+  </view>
+
+  <button class="primary-btn" bindtap="onCreateOrder">立即购买</button>
+</view>
+
+<view class="empty" wx:else>{{loading ? '加载中...' : '未找到套餐信息'}}</view>

@@ -1,0 +1,231 @@
+.container {
+  min-height: 100vh;
+  background: var(--brand-soft-gradient);
+  padding: var(--space-16);
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 48rpx;
+  padding-top: var(--radius-md);
+}
+
+.page-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #0F172A;
+  margin-bottom: 16rpx;
+}
+
+.page-subtitle {
+  display: block;
+  font-size: var(--text-base);
+  color: #64748B;
+}
+
+.package-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.package-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: var(--radius-md);
+  padding: 40rpx var(--space-16);
+  box-shadow: 0 14rpx 36rpx rgba(20, 184, 166, 0.14);
+  border: 2rpx solid rgba(20, 184, 166, 0.14);
+  transition: all var(--duration) ease;
+}
+
+.package-card.recommended {
+  border-color: var(--primary);
+  box-shadow: 0 8rpx var(--space-16) rgba(20, 184, 166, 0.2);
+}
+
+.recommend-badge {
+  position: absolute;
+  top: -var(--radius-sm);
+  right: var(--space-16);
+  background: var(--brand-gradient);
+  padding: 8rpx var(--radius-md);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4rpx var(--radius-sm) rgba(20, 184, 166, 0.4);
+}
+
+.badge-text {
+  font-size: var(--radius-md);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--radius-md);
+}
+
+.package-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.package-duration {
+  font-size: var(--text-base);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.price-section {
+  margin-bottom: var(--radius-md);
+}
+
+.price-main {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: var(--radius-sm);
+}
+
+.price-symbol {
+  font-size: 36rpx;
+  color: var(--primary);
+  font-weight: bold;
+  margin-right: 8rpx;
+}
+
+.price-value {
+  font-size: 64rpx;
+  color: var(--primary);
+  font-weight: bold;
+  line-height: 1;
+}
+
+.price-original {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.original-price {
+  font-size: var(--text-base);
+  color: #666666;
+  text-decoration: line-through;
+}
+
+.discount-tag {
+  background: var(--warning);
+  color: #ffffff;
+  font-size: var(--radius-md);
+  padding: 4rpx 16rpx;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.feature-tag {
+  display: flex;
+  align-items: center;
+  gap: var(--radius-sm);
+  background: rgba(20, 184, 166, 0.1);
+  padding: 16rpx var(--radius-md);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--radius-md);
+  border: 1rpx solid rgba(20, 184, 166, 0.22);
+}
+
+.tag-icon {
+  font-size: var(--space-16);
+  color: var(--primary);
+}
+
+.tag-text {
+  font-size: var(--text-base);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.package-desc {
+  font-size: 26rpx;
+  color: #999999;
+  line-height: 1.6;
+  margin-bottom: var(--space-16);
+}
+
+.buy-btn {
+  width: 100%;
+  height: 88rpx;
+  background: var(--brand-gradient);
+  color: #ffffff;
+  font-size: var(--space-16);
+  font-weight: bold;
+  border-radius: var(--radius-md);
+  border: none;
+  box-shadow: 0 8rpx var(--radius-md) rgba(20, 184, 166, 0.3);
+}
+
+.buy-btn::after {
+  border: none;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 112rpx 0;
+}
+
+.empty-icon {
+  font-size: 112rpx;
+  margin-bottom: var(--radius-md);
+}
+
+.empty-text {
+  font-size: var(--text-base);
+  color: #666666;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--btn-height) 0;
+}
+
+.loading-text {
+  font-size: var(--text-base);
+  color: #999999;
+}
+
+.bottom-notice {
+  margin-top: 48rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  padding: var(--space-16);
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.notice-title {
+  font-size: var(--text-base);
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 16rpx;
+}
+
+.notice-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--radius-sm);
+}
+
+.notice-content text {
+  font-size: 26rpx;
+  color: #64748B;
+  line-height: 1.6;
+}
+
+
+
+

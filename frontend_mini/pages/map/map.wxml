@@ -1,0 +1,123 @@
+<!-- pages/map/map.wxml — 地图为原生组件，顶栏/悬浮按钮必须用 cover-view 才能响应点击 -->
+<view class="map-container">
+  <map
+    id="map"
+    class="map"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    scale="{{scale}}"
+    markers="{{markers}}"
+    show-location="{{locationEnabled}}"
+    bindmarkertap="onMarkerTap"
+    bindcallouttap="onCalloutTap"
+    bindregionchange="onRegionChange"
+  >
+    <cover-view slot="callout">
+      <block wx:for="{{markers}}" wx:key="id">
+        <cover-view marker-id="{{item.id}}" class="custom-callout" style="background-color: {{item.customCallout.bgColor}}">
+          <cover-view class="content">{{item.customCallout.content}}</cover-view>
+        </cover-view>
+      </block>
+    </cover-view>
+  </map>
+  
+  <!-- 仿小哈地图中心选点大头针 -->
+  <cover-view class="map-center-pin">
+    <cover-image class="pin-icon" src="/images/pin.png"></cover-image>
+  </cover-view>
+
+  <cover-view class="cover-search-wrap">
+    <cover-view class="search-box-cover" bindtap="onChooseSearchArea">
+      <cover-view class="search-text-cover">{{searchKeyword || '点击选择位置 / 商圈'}}</cover-view>
+    </cover-view>
+  </cover-view>
+
+  <cover-view class="cover-fab cover-fab-locate" bindtap="relocateUser">
+    <cover-view class="fab-btn-cover">
+      <cover-image class="fab-img-cover" src="/images/fab-locate.png"></cover-image>
+    </cover-view>
+    <cover-view class="fab-caption-cover">定位</cover-view>
+  </cover-view>
+
+  <cover-view class="cover-fab cover-fab-refresh" bindtap="onRefresh">
+    <cover-view class="fab-btn-cover">
+      <cover-image class="fab-img-cover" src="/images/fab-refresh.png"></cover-image>
+    </cover-view>
+    <cover-view class="fab-caption-cover">刷新</cover-view>
+  </cover-view>
+
+  <!-- 隐私授权：必须用 open-type=agreePrivacyAuthorization 的 button，不能用 showModal 代替 -->
+  <cover-view class="privacy-cover" wx:if="{{showPrivacyAuthorization}}">
+    <cover-view class="privacy-panel">
+      <cover-view class="privacy-title">用户隐私保护提示</cover-view>
+      <cover-view class="privacy-desc">
+        为使用定位、地图选点、展示附近换电站，需你同意《用户隐私保护指引》。如小程序未配置指引，请管理员登录微信公众平台 → 设置 → 服务内容声明 → 用户隐私保护指引。
+      </cover-view>
+      <button
+        id="agree-btn"
+        class="privacy-agree-btn"
+        open-type="agreePrivacyAuthorization"
+        bindagreeprivacyauthorization="onAgreePrivacyAuthorization"
+      >
+        同意并继续
+      </button>
+      <cover-view class="privacy-reject" bindtap="onRejectPrivacyAuthorization">暂不使用定位</cover-view>
+    </cover-view>
+  </cover-view>
+
+  <view class="station-detail {{showStationDetail ? 'show' : ''}}" wx:if="{{selectedStation}}">
+    <view class="detail-mask" bindtap="hideStationDetail"></view>
+    <view class="detail-content">
+      <view class="station-info">
+        <view class="station-name">{{selectedStation.name}}</view>
+        <view class="station-address">{{selectedStation.address}}</view>
+        <view class="station-stats">
+          <view class="stat-item">
+            <text class="stat-label">可用电池</text>
+            <text class="stat-value stat-available">{{selectedStation.available_batteries}}</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-label">总电池数</text>
+            <text class="stat-value">{{selectedStation.total_batteries}}</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-label">充电中</text>
+            <text class="stat-value stat-charging">{{selectedStation.charging_batteries}}</text>
+          </view>
+        </view>
+        <!-- 资源进度条 -->
+        <view class="detail-resource-bar">
+          <view class="detail-bar-track">
+            <view class="detail-bar-fill bar-available" style="width: {{selectedStation.total_batteries > 0 ? (selectedStation.available_batteries / selectedStation.total_batteries * 100) : 0}}%"></view>
+            <view class="detail-bar-fill bar-charging" style="width: {{selectedStation.total_batteries > 0 ? (selectedStation.charging_batteries / selectedStation.total_batteries * 100) : 0}}%"></view>
+          </view>
+        </view>
+        <view class="detail-resource-hint" wx:if="{{selectedStation.available_batteries === 0}}">
+          <text class="hint-warn">当前无可用电池</text>
+        </view>
+        <view class="detail-resource-hint" wx:elif="{{selectedStation.available_batteries >= 5}}">
+          <text class="hint-good">电池充足</text>
+        </view>
+      </view>
+
+      <view class="action-buttons">
+        <button class="action-btn secondary" bindtap="navigateToStation">导航</button>
+        <button class="action-btn primary" bindtap="viewStationDetail">查看详情</button>
+      </view>
+
+      <view class="close-btn" bindtap="hideStationDetail">
+        <icon type="clear" size="18" color="#999"></icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- 智能推荐浮层 -->
+  <view class="smart-recommend" wx:if="{{smartRecommend && !showStationDetail}}" bindtap="onSmartRecommendTap">
+    <view class="smart-recommend-inner">
+      <text class="smart-label">智能推荐</text>
+      <text class="smart-station-name">{{smartRecommend.name}}</text>
+      <text class="smart-detail">可用 {{smartRecommend.available_batteries}} 台 · {{smartRecommend.distance || '?'}}m</text>
+    </view>
+    <text class="smart-go">前往</text>
+  </view>
+</view>

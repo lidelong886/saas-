@@ -1,0 +1,10 @@
+<!-- 电池状态指示灯组件 -->
+<view class="battery-status">
+  <view class="battery-status__indicator status-{{status}}">
+    <view class="battery-status__dot"></view>
+  </view>
+  <view class="battery-status__info">
+    <text class="battery-status__label">{{statusText}}</text>
+    <text class="battery-status__count">{{count}}</text>
+  </view>
+</view>

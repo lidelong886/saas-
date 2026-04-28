@@ -1,0 +1,23 @@
+# ESLint忽略文件配置
+
+# 构建输出目录
+dist/
+build/
+
+# 依赖目录
+node_modules/
+
+# 静态资源
+public/
+src/assets/
+
+# 配置文件
+*.config.js
+vue.config.js
+
+# 自动生成文件
+auto-imports.d.ts
+components.d.ts
+
+# 日志文件
+*.log

@@ -1,0 +1,5 @@
+{
+  "navigationBarTitleText": "电池商店",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50
+}

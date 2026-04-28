@@ -1,0 +1,61 @@
+<!--pages/profile/tenant.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">运营商入驻申请</text>
+    <text class="subtitle">成为PowerNest合作伙伴，共创智慧换电新未来</text>
+  </view>
+
+  <view class="form-container" wx:if="{{!submitted}}">
+    <form bindsubmit="onSubmit">
+      <!-- 基础信息 -->
+      <view class="section">
+        <view class="section-title">基础信息</view>
+        <view class="input-group">
+          <text class="label">公司/个人名称</text>
+          <input name="name" class="input" placeholder="请输入公司或个人名称" value="{{formData.name}}" />
+        </view>
+        <view class="input-group">
+          <text class="label">联系人姓名</text>
+          <input name="contactName" class="input" placeholder="请输入真实姓名" value="{{formData.contactName}}" />
+        </view>
+        <view class="input-group">
+          <text class="label">联系电话</text>
+          <input name="phone" class="input" type="number" maxlength="11" placeholder="请输入手机号码" value="{{formData.phone}}" />
+        </view>
+      </view>
+
+      <!-- 合作意向 -->
+      <view class="section">
+        <view class="section-title">合作意向</view>
+        <view class="input-group">
+          <text class="label">意向城市</text>
+          <input name="city" class="input" placeholder="例如：北京市 朝阳区" value="{{formData.city}}" />
+        </view>
+        <view class="input-group">
+          <text class="label">预计投入资金</text>
+          <picker bindchange="onFundChange" value="{{fundIndex}}" range="{{fundOptions}}">
+            <view class="picker-view">
+              <text class="{{fundIndex === -1 ? 'placeholder' : ''}}">{{fundIndex === -1 ? '请选择资金规模' : fundOptions[fundIndex]}}</text>
+              <text class="arrow">></text>
+            </view>
+          </picker>
+        </view>
+        <view class="input-group vertical">
+          <text class="label">自有资源优势或留言</text>
+          <textarea name="message" class="textarea" placeholder="请简要描述您的场地、团队等资源优势" value="{{formData.message}}" />
+        </view>
+      </view>
+
+      <button class="submit-btn" form-type="submit" disabled="{{loading}}">
+        {{loading ? '提交中...' : '提交申请'}}
+      </button>
+    </form>
+  </view>
+
+  <view class="success-container" wx:else>
+    <view class="success-icon">✓</view>
+    <text class="success-title">申请已提交</text>
+    <text class="success-desc">感谢您的支持！我们的招商专员将在1-3个工作日内与您联系，请保持电话畅通。</text>
+    <button class="back-btn" bindtap="goBack">返回我的</button>
+  </view>
+</view>

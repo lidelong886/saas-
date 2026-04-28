@@ -1,0 +1,33 @@
+<!-- pages/fault/list.wxml -->
+<view class="container">
+  <view class="report-list" wx:if="{{reports.length > 0}}">
+    <view class="report-item" wx:for="{{reports}}" wx:key="id">
+      <view class="report-header">
+        <text class="report-no">{{item.report_no}}</text>
+        <view class="status-tag" style="background: {{statusMap[item.status].color || '#999'}}">
+          <text>{{statusMap[item.status].text || item.status}}</text>
+        </view>
+      </view>
+      <view class="report-body">
+        <view class="report-type">{{typeMap[item.fault_type] || item.fault_type}}</view>
+        <view class="report-desc">{{item.description}}</view>
+        <view class="report-station" wx:if="{{item.station_name}}">站点：{{item.station_name}}</view>
+      </view>
+      <view class="report-footer">
+        <text class="report-time">{{item.created_at}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{reports.length === 0 && !isLoading}}">
+    <text class="empty-text">暂无报修记录</text>
+  </view>
+
+  <view class="loading" wx:if="{{isLoading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="fab-btn" bindtap="onNewReport">
+    <text>+</text>
+  </view>
+</view>

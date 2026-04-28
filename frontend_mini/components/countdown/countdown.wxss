@@ -1,0 +1,84 @@
+/* 倒计时组件样式 - 高效工业风 */
+.countdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.countdown-label {
+  font-size: 24rpx;
+  color: #8C8C8C;
+  font-weight: 500;
+}
+
+.countdown-time {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  font-family: 'SF Mono', 'Consolas', monospace;
+}
+
+.time-number {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: var(--success);
+  line-height: 1;
+  text-shadow: 0 0 10rpx rgba(0, 255, 136, 0.3);
+}
+
+.time-unit {
+  font-size: 28rpx;
+  color: #8C8C8C;
+  font-weight: 500;
+}
+
+.countdown-progress {
+  width: 100%;
+  height: 6rpx;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3rpx;
+  overflow: hidden;
+  margin-top: 8rpx;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success) 0%, #00CC6F 100%);
+  border-radius: 3rpx;
+  transition: width 1s linear;
+  box-shadow: 0 0 10rpx rgba(0, 255, 136, 0.5);
+}
+
+/* 警告状态（剩余时间<5分钟） */
+.countdown.warning .time-number {
+  color: #FF9500;
+  text-shadow: 0 0 10rpx rgba(255, 149, 0, 0.3);
+}
+
+.countdown.warning .progress-bar {
+  background: linear-gradient(90deg, #FF9500 0%, #FF6B00 100%);
+  box-shadow: 0 0 10rpx rgba(255, 149, 0, 0.5);
+}
+
+/* 危险状态（剩余时间<2分钟） */
+.countdown.danger .time-number {
+  color: var(--danger);
+  text-shadow: 0 0 10rpx rgba(255, 59, 48, 0.3);
+  animation: pulse 1s infinite;
+}
+
+.countdown.danger .progress-bar {
+  background: linear-gradient(90deg, var(--danger) 0%, #CC0000 100%);
+  box-shadow: 0 0 10rpx rgba(255, 59, 48, 0.5);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+

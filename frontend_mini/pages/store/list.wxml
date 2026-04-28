@@ -1,0 +1,35 @@
+<!--pages/store/list.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">电池商店</text>
+    <text class="subtitle">购买属于自己的电池</text>
+  </view>
+
+  <view class="battery-list" wx:if="{{batteries.length > 0}}">
+    <view class="battery-card" wx:for="{{batteries}}" wx:key="id">
+      <view class="battery-info" bindtap="onBatteryTap" data-battery="{{item}}">
+        <view class="battery-header">
+          <text class="battery-model">{{item.model}}</text>
+          <view class="battery-voltage-tag">{{item.voltage_type || '60V'}}</view>
+        </view>
+        <view class="battery-specs">
+          <text class="spec-item">容量: {{item.capacity}}mAh</text>
+          <text class="spec-item">电量: {{item.power_level}}%</text>
+        </view>
+        <view class="battery-code">编号: {{item.battery_code}}</view>
+      </view>
+      <view class="battery-action">
+        <view class="price-section">
+          <text class="price-label">售价</text>
+          <text class="price-value">¥{{item.selling_price || item.deposit_amount}}</text>
+        </view>
+        <button class="buy-btn" bindtap="onPurchaseTap" data-battery="{{item}}">立即购买</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">🔋</text>
+    <text class="empty-text">暂无可售电池</text>
+  </view>
+</view>

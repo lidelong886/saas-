@@ -1,0 +1,237 @@
+/* 电池预约详情页面 - 高效工业风 */
+.reservation-detail-page {
+  min-height: 100vh;
+  background: #1A1A1A;
+  padding-bottom: 188rpx;
+}
+
+/* 状态卡片 */
+.status-card {
+  margin: var(--space-16);
+  padding: 40rpx;
+  background: #242424;
+  border-radius: var(--radius-md);
+  text-align: center;
+  border: 2rpx solid rgba(0, 255, 136, 0.3);
+}
+
+.status-card.active {
+  border-color: var(--success);
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 204, 111, 0.05) 100%);
+}
+
+.status-card.completed {
+  border-color: var(--success);
+  background: rgba(0, 255, 136, 0.05);
+}
+
+.status-card.cancelled,
+.status-card.expired {
+  border-color: #8C8C8C;
+  background: rgba(140, 140, 140, 0.05);
+}
+
+.status-icon {
+  font-size: 96rpx;
+  margin-bottom: 16rpx;
+}
+
+.status-card.active .status-icon {
+  animation: pulse 2s infinite;
+}
+
+.status-text {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: var(--space-16);
+}
+
+.status-card countdown {
+  margin-top: var(--space-16);
+}
+
+/* 信息区块 */
+.info-section {
+  margin: var(--radius-md) var(--space-16);
+}
+
+.section-title {
+  font-size: var(--space-16);
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 16rpx;
+}
+
+.info-card {
+  padding: var(--space-16);
+  background: #242424;
+  border-radius: var(--radius-sm);
+  border: 2rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--radius-md) 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: var(--text-base);
+  color: #8C8C8C;
+}
+
+.info-value {
+  font-size: var(--text-base);
+  color: #FFFFFF;
+  font-weight: 500;
+  text-align: right;
+  max-width: 60%;
+}
+
+.info-value.highlight {
+  color: var(--success);
+  font-weight: 700;
+}
+
+/* 导航按钮 */
+.navigate-btn {
+  margin-top: var(--radius-md);
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, var(--success) 0%, #00CC6F 100%);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--radius-sm);
+  font-size: var(--space-16);
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.btn-icon {
+  font-size: 36rpx;
+}
+
+/* 电池卡片 */
+.battery-card {
+  background: linear-gradient(135deg, #242424 0%, #2A2A2A 100%);
+}
+
+.battery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--radius-md);
+  padding-bottom: var(--radius-md);
+  border-bottom: 2rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.battery-code {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--success);
+  font-family: 'SF Mono', monospace;
+}
+
+.battery-stats {
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--radius-sm);
+}
+
+.stat-label {
+  font-size: var(--radius-md);
+  color: #8C8C8C;
+}
+
+.stat-value {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--success);
+  font-family: 'SF Mono', monospace;
+}
+
+/* 温馨提示 */
+.tips-section {
+  margin: var(--radius-md) var(--space-16);
+  padding: 28rpx;
+  background: rgba(255, 149, 0, 0.1);
+  border-radius: var(--radius-sm);
+  border: 2rpx solid rgba(255, 149, 0, 0.3);
+}
+
+.tips-title {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: #FF9500;
+  margin-bottom: 16rpx;
+}
+
+.tips-item {
+  font-size: 26rpx;
+  color: #D9D9D9;
+  line-height: 1.6;
+  margin-bottom: 8rpx;
+}
+
+/* 底部操作按钮 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--radius-md) var(--space-16);
+  padding-bottom: calc(var(--radius-md) + env(safe-area-inset-bottom));
+  background: #242424;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: var(--radius-md);
+}
+
+.action-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: var(--radius-sm);
+  font-size: var(--space-16);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancel-btn {
+  background: #3A3A3A;
+  color: #FFFFFF;
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+}
+
+.complete-btn {
+  background: linear-gradient(135deg, var(--success) 0%, #00CC6F 100%);
+  color: #1A1A1A;
+  box-shadow: 0 8rpx var(--radius-md) rgba(0, 255, 136, 0.3);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+

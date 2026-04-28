@@ -1,0 +1,70 @@
+<!--pages/battery/scan.wxml-->
+<view class="container">
+  <!-- 扫码区域 -->
+  <view class="scan-section" wx:if="{{!hasScanned}}">
+    <view class="scan-icon">📱</view>
+    <text class="scan-title">扫描电池二维码</text>
+    <text class="scan-desc">将二维码放入框内，即可自动扫描</text>
+    <button class="scan-btn" bindtap="onScanTap">开始扫码</button>
+  </view>
+
+  <!-- 电池信息 -->
+  <view class="battery-section" wx:if="{{hasScanned && batteryInfo}}">
+    <view class="battery-card">
+      <view class="battery-header">
+        <text class="battery-title">电池信息</text>
+        <view class="battery-status status-{{batteryInfo.status}}">
+          {{batteryInfo.status === 'available' ? '可用' : '不可用'}}
+        </view>
+      </view>
+
+      <view class="battery-info">
+        <view class="info-row">
+          <text class="info-label">电池编号</text>
+          <text class="info-value">{{batteryInfo.battery_code}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">电池类型</text>
+          <text class="info-value">{{batteryInfo.battery_type || '标准型'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">电量</text>
+          <text class="info-value">{{batteryInfo.power_level || 100}}%</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">所在站点</text>
+          <text class="info-value">{{batteryInfo.station_name || '未知'}}</text>
+        </view>
+      </view>
+
+      <view class="battery-price">
+        <view class="price-item">
+          <text class="price-label">押金</text>
+          <text class="price-value">¥{{batteryInfo.deposit_amount || 0}}</text>
+        </view>
+        <view class="price-item">
+          <text class="price-label">租金</text>
+          <text class="price-value">¥{{batteryInfo.rental_price_per_hour || 0}}/小时</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button class="action-btn secondary-btn" bindtap="onRescan">重新扫码</button>
+      <button class="action-btn primary-btn" bindtap="onConfirmRent" 
+              disabled="{{batteryInfo.status !== 'available'}}">
+        确认租用
+      </button>
+    </view>
+
+    <!-- 提示信息 -->
+    <view class="tips-section">
+      <text class="tips-title">温馨提示</text>
+      <text class="tips-item">• 租用前请确认电池电量充足</text>
+      <text class="tips-item">• 押金将在归还电池后退回</text>
+      <text class="tips-item">• 租金按天计算，不足一天按一天计算</text>
+      <text class="tips-item">• 请妥善保管电池，如有损坏需赔偿</text>
+    </view>
+  </view>
+</view>

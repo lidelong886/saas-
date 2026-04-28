@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "预约电池",
+  "navigationBarBackgroundColor": "#1A1A1A",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#1A1A1A",
+  "usingComponents": {
+    "battery-status": "/components/battery-status/battery-status"
+  }
+}
