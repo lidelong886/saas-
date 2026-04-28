@@ -267,6 +267,8 @@ def create_app(config_name='development'):
     with app.app_context():
         try:
             db.create_all()
+            from .utils.demo_seed import ensure_demo_data
+            ensure_demo_data(app)
             app.logger.info('数据库表创建成功')
         except Exception as e:
             app.logger.error(f'数据库表创建失败: {str(e)}')
