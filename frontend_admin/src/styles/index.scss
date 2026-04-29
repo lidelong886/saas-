@@ -118,12 +118,12 @@ a {
   }
 
   &.el-button--success {
-    background: linear-gradient(135deg, $success-color 0%, darken($success-color, 8%) 100%);
+    background: linear-gradient(135deg, $success-color 0%, #0d9668 100%);
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
   }
 
   &.el-button--danger {
-    background: linear-gradient(135deg, $danger-color 0%, darken($danger-color, 8%) 100%);
+    background: linear-gradient(135deg, $danger-color 0%, #e11d48 100%);
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
   }
 }

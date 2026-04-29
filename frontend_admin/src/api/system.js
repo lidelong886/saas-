@@ -15,6 +15,21 @@ export function createTenant(data) {
   })
 }
 
+export function updateTenant(id, data) {
+  return request({
+    url: `/admin/rbac/tenants/${id}`,
+    method: 'put',
+    data
+  })
+}
+
+export function deleteTenant(id) {
+  return request({
+    url: `/admin/rbac/tenants/${id}`,
+    method: 'delete'
+  })
+}
+
 export function getTenantApplications(params) {
   return request({
     url: '/admin/rbac/tenant-applications',

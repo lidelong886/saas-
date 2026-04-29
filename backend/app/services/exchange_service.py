@@ -2,12 +2,20 @@
 换电服务
 """
 from datetime import datetime, timedelta
+from decimal import Decimal
 from flask import g
 from ..models import Battery, ExchangeRecord, User, Order
 from .. import db
+from .rider_service import RiderService
+from .tenant_config_service import TenantConfigService
+from .wallet_service import WalletService
 
 class ExchangeService:
     """换电服务类"""
+
+    @staticmethod
+    def get_tenant_exchange_fee(tenant_id=None):
+        return TenantConfigService.get_value(tenant_id or getattr(g, 'tenant_id', 1), 'exchange_fee')
 
     @staticmethod
     def exchange_battery(user_id, old_battery_id, new_battery_id, station_id, cabinet_id, latitude=None, longitude=None):
@@ -70,6 +78,12 @@ class ExchangeService:
             if not new_battery.is_available():
                 return False, "新电池不可用"
 
+            has_package, package_info = RiderService.check_user_has_active_rider_package(user_id)
+            exchange_fee = 0.0 if has_package else ExchangeService.get_tenant_exchange_fee(g.tenant_id)
+            exchange_fee_dec = Decimal(str(exchange_fee))
+            if exchange_fee_dec > 0 and Decimal(str(user.balance or 0)) < exchange_fee_dec:
+                return False, f"余额不足，换电费用为¥{exchange_fee_dec:.2f}"
+
             rented_order = Order.query.filter_by(
                 user_id=user_id,
                 battery_id=old_battery.id,
@@ -94,6 +108,7 @@ class ExchangeService:
                 new_battery_id=new_battery_id,
                 station_id=station_id,
                 cabinet_id=cabinet_id,
+                exchange_fee=exchange_fee,
                 tenant_id=g.tenant_id
             )
 
@@ -122,6 +137,18 @@ class ExchangeService:
                 rented_order.cabinet_id = cabinet_id
                 rented_order.return_latitude = latitude
                 rented_order.return_longitude = longitude
+                rented_order.exchange_fee = exchange_fee
+
+            if exchange_fee_dec > 0:
+                tx = WalletService.create_transaction(
+                    user,
+                    exchange_fee_dec,
+                    'exchange',
+                    'expense',
+                    order_id=rented_order.id if rented_order else None,
+                    remarks=f'换电服务费 {exchange_record.record_no}'
+                )
+                user.balance = tx.balance_after
 
             db.session.add(exchange_record)
             db.session.commit()
@@ -137,6 +164,8 @@ class ExchangeService:
                 'exchange_time': exchange_record.created_at.isoformat(),
                 'new_battery_power': new_battery.power_level,
                 'exchange_fee': float(exchange_record.exchange_fee or 0),
+                'has_rider_package': has_package,
+                'package_info': package_info,
                 'station_id': station_id,
                 'cabinet_id': cabinet_id,
                 'new_battery': {

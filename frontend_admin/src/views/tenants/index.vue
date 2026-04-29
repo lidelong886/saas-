@@ -31,7 +31,16 @@
         <el-table-column prop="user_count" label="用户数" width="90" />
         <el-table-column prop="station_count" label="站点数" width="90" />
         <el-table-column prop="battery_count" label="电池数" width="90" />
+        <el-table-column label="换电费用" width="110">
+          <template #default="{ row }">¥{{ Number(row.exchange_fee || 0).toFixed(2) }}</template>
+        </el-table-column>
         <el-table-column prop="created_at" label="创建时间" min-width="170" />
+        <el-table-column label="操作" width="170" fixed="right">
+          <template #default="{ row }">
+            <el-button size="small" type="primary" plain @click="showEditDialog(row)">编辑</el-button>
+            <el-button size="small" type="danger" plain :disabled="row.id === 1" @click="removeTenant(row)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
@@ -63,17 +72,45 @@
       </el-table>
     </el-card>
 
-    <el-dialog v-model="createVisible" title="新增租户" width="520px">
-      <el-form :model="createForm" label-width="96px">
-        <el-form-item label="租户名称"><el-input v-model="createForm.name" placeholder="例如：蜂鸟换电" /></el-form-item>
-        <el-form-item label="租户编码"><el-input v-model="createForm.code" placeholder="例如：FENGNIAO" /></el-form-item>
-        <el-form-item label="品牌名称"><el-input v-model="createForm.brand_name" placeholder="小程序展示名称" /></el-form-item>
-        <el-form-item label="联系人"><el-input v-model="createForm.contact_name" /></el-form-item>
-        <el-form-item label="联系电话"><el-input v-model="createForm.contact_phone" /></el-form-item>
+    <el-dialog v-model="tenantDialogVisible" :title="isEdit ? '编辑租户' : '新增租户'" width="560px">
+      <el-form :model="tenantForm" label-width="108px">
+        <el-form-item label="租户名称"><el-input v-model="tenantForm.name" placeholder="例如：蜂鸟换电" /></el-form-item>
+        <el-form-item label="租户编码"><el-input v-model="tenantForm.code" placeholder="例如：FENGNIAO" /></el-form-item>
+        <el-form-item label="品牌名称"><el-input v-model="tenantForm.brand_name" placeholder="小程序展示名称" /></el-form-item>
+        <el-form-item label="联系人"><el-input v-model="tenantForm.contact_name" /></el-form-item>
+        <el-form-item label="联系电话"><el-input v-model="tenantForm.contact_phone" /></el-form-item>
+        <el-form-item label="联系邮箱"><el-input v-model="tenantForm.contact_email" /></el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="tenantForm.status" style="width: 100%">
+            <el-option label="正常" value="active" />
+            <el-option label="停用" value="disabled" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="换电费用">
+          <el-input-number v-model="tenantForm.exchange_fee" :min="0" :precision="2" :step="0.5" style="width: 100%" />
+          <div class="form-tip">用户没有有效套餐时，按该租户价格收取换电费用；有套餐仍为 0 元。</div>
+        </el-form-item>
+        <el-form-item label="租赁单价">
+          <el-input-number v-model="tenantForm.rental_price_per_hour" :min="0" :precision="2" :step="0.1" style="width: 100%" />
+          <div class="form-tip">新建电池未单独填写价格时，默认使用该租户租赁单价。</div>
+        </el-form-item>
+        <el-form-item label="超时费率">
+          <el-input-number v-model="tenantForm.overtime_rate" :min="0" :precision="2" :step="0.1" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="押金金额">
+          <el-input-number v-model="tenantForm.deposit_amount" :min="0" :precision="2" :step="1" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="订单超时">
+          <el-input-number v-model="tenantForm.order_timeout_minutes" :min="1" :step="1" style="width: 100%" />
+        </el-form-item>
+        <el-form-item label="用户配额"><el-input-number v-model="tenantForm.max_users" :min="1" style="width: 100%" /></el-form-item>
+        <el-form-item label="站点配额"><el-input-number v-model="tenantForm.max_stations" :min="1" style="width: 100%" /></el-form-item>
+        <el-form-item label="电池配额"><el-input-number v-model="tenantForm.max_batteries" :min="1" style="width: 100%" /></el-form-item>
+        <el-form-item label="备注"><el-input v-model="tenantForm.remarks" type="textarea" :rows="2" /></el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="createVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitCreate">创建</el-button>
+        <el-button @click="tenantDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitTenant">{{ isEdit ? '保存' : '创建' }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -81,7 +118,7 @@
 
 <script>
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getTenantList, createTenant, getTenantApplications, reviewTenantApplication } from '@/api/system'
+import { getTenantList, createTenant, updateTenant, deleteTenant, getTenantApplications, reviewTenantApplication } from '@/api/system'
 
 export default {
   name: 'Tenants',
@@ -91,8 +128,27 @@ export default {
       applicationLoading: false,
       tenants: [],
       applications: [],
-      createVisible: false,
-      createForm: { name: '', code: '', brand_name: '', contact_name: '', contact_phone: '' }
+      tenantDialogVisible: false,
+      isEdit: false,
+      tenantForm: {
+        id: null,
+        name: '',
+        code: '',
+        brand_name: '',
+        contact_name: '',
+        contact_phone: '',
+        contact_email: '',
+        status: 'active',
+        exchange_fee: 3,
+        rental_price_per_hour: 0.5,
+        overtime_rate: 1.5,
+        deposit_amount: 50,
+        order_timeout_minutes: 15,
+        max_users: 100,
+        max_stations: 20,
+        max_batteries: 1000,
+        remarks: ''
+      }
     }
   },
   computed: {
@@ -127,19 +183,69 @@ export default {
         this.applicationLoading = false
       }
     },
-    showCreateDialog() {
-      this.createForm = { name: '', code: '', brand_name: '', contact_name: '', contact_phone: '' }
-      this.createVisible = true
+    getEmptyTenantForm() {
+      return {
+        id: null,
+        name: '',
+        code: '',
+        brand_name: '',
+        contact_name: '',
+        contact_phone: '',
+        contact_email: '',
+        status: 'active',
+        exchange_fee: 3,
+        rental_price_per_hour: 0.5,
+        overtime_rate: 1.5,
+        deposit_amount: 50,
+        order_timeout_minutes: 15,
+        max_users: 100,
+        max_stations: 20,
+        max_batteries: 1000,
+        remarks: ''
+      }
     },
-    async submitCreate() {
-      if (!this.createForm.name || !this.createForm.code) return ElMessage.warning('请填写租户名称和编码')
+    showCreateDialog() {
+      this.isEdit = false
+      this.tenantForm = this.getEmptyTenantForm()
+      this.tenantDialogVisible = true
+    },
+    showEditDialog(row) {
+      this.isEdit = true
+      this.tenantForm = {
+        ...this.getEmptyTenantForm(),
+        ...row,
+        exchange_fee: Number(row.exchange_fee || 0),
+        rental_price_per_hour: Number(row.rental_price_per_hour || 0),
+        overtime_rate: Number(row.overtime_rate || 0),
+        deposit_amount: Number(row.deposit_amount || 0),
+        order_timeout_minutes: Number(row.order_timeout_minutes || 15)
+      }
+      this.tenantDialogVisible = true
+    },
+    async submitTenant() {
+      if (!this.tenantForm.name || !this.tenantForm.code) return ElMessage.warning('请填写租户名称和编码')
       try {
-        await createTenant(this.createForm)
-        ElMessage.success('租户创建成功')
-        this.createVisible = false
+        if (this.isEdit) {
+          await updateTenant(this.tenantForm.id, this.tenantForm)
+          ElMessage.success('租户更新成功')
+        } else {
+          await createTenant(this.tenantForm)
+          ElMessage.success('租户创建成功')
+        }
+        this.tenantDialogVisible = false
         this.loadTenants()
       } catch (error) {
-        ElMessage.error('创建失败：' + (error.response?.data?.message || error.message))
+        ElMessage.error('保存失败：' + (error.response?.data?.message || error.message))
+      }
+    },
+    async removeTenant(row) {
+      try {
+        await ElMessageBox.confirm(`确认删除租户“${row.name}”？删除后该租户不会再出现在管理列表。`, '删除确认', { type: 'warning' })
+        await deleteTenant(row.id)
+        ElMessage.success('租户删除成功')
+        this.loadTenants()
+      } catch (error) {
+        if (error !== 'cancel') ElMessage.error('删除失败：' + (error.response?.data?.message || error.message))
       }
     },
     async review(row, action) {
@@ -181,4 +287,5 @@ export default {
 .table-header { display: flex; justify-content: space-between; align-items: center; }
 .title { font-size: 18px; font-weight: 700; color: #0f172a; }
 .muted { color: #94a3b8; font-size: 13px; }
+.form-tip { margin-top: 6px; font-size: 12px; line-height: 1.5; color: #94a3b8; }
 </style>

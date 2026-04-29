@@ -44,6 +44,10 @@ class Config:
     ORDER_PENDING_TIMEOUT_MINUTES = int(os.environ.get('ORDER_PENDING_TIMEOUT_MINUTES') or 15)
     ORDER_TIMEOUT_SCAN_INTERVAL_SECONDS = int(os.environ.get('ORDER_TIMEOUT_SCAN_INTERVAL_SECONDS') or 60)
 
+    # 数据初始化配置：开发演示可自动建表和填充数据，生产环境必须显式开启
+    AUTO_CREATE_TABLES = os.environ.get('AUTO_CREATE_TABLES', 'false').lower() == 'true'
+    ENABLE_DEMO_DATA = os.environ.get('ENABLE_DEMO_DATA', 'false').lower() == 'true'
+
     # CORS配置：开发环境可放开，生产环境必须通过环境变量显式配置
     CORS_ORIGINS = os.environ.get('CORS_ORIGINS') or '*'
 
@@ -69,6 +73,8 @@ class DevelopmentConfig(Config):
     SECRET_KEY = Config.SECRET_KEY or os.environ.get('DEV_SECRET_KEY', 'dev-secret-key-change-in-production')
     JWT_SECRET_KEY = Config.JWT_SECRET_KEY or os.environ.get('DEV_JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
     AMAP_KEY = Config.AMAP_KEY or os.environ.get('DEV_AMAP_KEY', '')
+    AUTO_CREATE_TABLES = os.environ.get('AUTO_CREATE_TABLES', 'true').lower() == 'true'
+    ENABLE_DEMO_DATA = os.environ.get('ENABLE_DEMO_DATA', 'true').lower() == 'true'
     if os.environ.get('DATABASE_URL'):
         SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     else:

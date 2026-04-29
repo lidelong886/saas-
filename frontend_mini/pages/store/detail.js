@@ -1,5 +1,5 @@
 // pages/store/detail.js
-const { purchaseBattery } = require('../../api/store')
+const { purchaseBatteryCategory } = require('../../api/store')
 
 function formatMoney(value) {
   const number = Number(value || 0)
@@ -55,7 +55,10 @@ Page({
       success: res => {
         if (!res.confirm) return
         wx.showLoading({ title: '提交订单...' })
-        purchaseBattery(battery.id).then(() => {
+        purchaseBatteryCategory({
+          voltage_type: battery.voltageType || battery.voltage_type,
+          capacity: battery.capacity
+        }).then(() => {
           wx.hideLoading()
           wx.showToast({ title: '购买成功', icon: 'success' })
           setTimeout(() => wx.navigateBack(), 900)

@@ -17,7 +17,6 @@ admin_auth_bp = Blueprint('admin_auth', __name__)
 def login():
     try:
         data = request.get_json() or {}
-        print(f"Login Debug - Data received: {data}")
         phone = data.get('username') or data.get('phone') or ''
         phone = str(phone).strip()
         password = data.get('password', '')

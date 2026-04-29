@@ -14,7 +14,12 @@ function purchaseBattery(batteryId) {
   return request.post(`/store/purchase/${batteryId}`)
 }
 
+function purchaseBatteryCategory(data) {
+  return request.post('/store/purchase-category', data)
+}
+
 module.exports = {
   getStoreBatteries,
-  purchaseBattery
+  purchaseBattery,
+  purchaseBatteryCategory
 }

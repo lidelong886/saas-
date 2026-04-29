@@ -6,6 +6,7 @@ from flask import g, current_app
 from ..models import Order, Battery, User, Package, UserPackage
 from ..models.payment import Payment, PaymentType, PaymentMethod, PaymentStatus
 from .. import db
+from .tenant_config_service import TenantConfigService
 
 # 模块级常量，避免在静态方法中引用类名自身
 PENDING_TIMEOUT_MINUTES = 15
@@ -34,7 +35,9 @@ class OrderService:
                 station_id=station_id,
                 cabinet_id=cabinet_id,
                 source=source,
-                timeout_cancel_at=datetime.now() + timedelta(minutes=PENDING_TIMEOUT_MINUTES)
+                timeout_cancel_at=datetime.now() + timedelta(
+                    minutes=TenantConfigService.get_value(g.tenant_id, 'order_timeout_minutes')
+                )
             )
 
             if order_type == 'rental':
@@ -70,8 +73,10 @@ class OrderService:
                     deposit_fee = 0.0 # 押金通常在买套餐时付过了
                     # Note: order is saved as 'pending' by default in __init__, but we will auto-pay it later
                 else:
-                    rental_fee = float(battery.rental_price_per_hour) * use_hours
-                    deposit_fee = float(battery.deposit_amount)
+                    unit_price = float(battery.rental_price_per_hour or TenantConfigService.get_value(g.tenant_id, 'rental_price_per_hour'))
+                    rental_fee = unit_price * use_hours
+                    deposit_fee = float(battery.deposit_amount or TenantConfigService.get_value(g.tenant_id, 'deposit_amount'))
+                    order.unit_price = unit_price
                 
                 order.rental_fee = rental_fee
                 order.deposit_fee = deposit_fee
@@ -84,7 +89,9 @@ class OrderService:
                     'deposit_fee': deposit_fee
                 }
             elif order_type == 'exchange':
-                exchange_fee = float(pkg.exchange_fee) if pkg else 0.00
+                if package_id and not pkg:
+                    return False, '套餐不存在'
+                exchange_fee = float(pkg.exchange_fee) if pkg else TenantConfigService.get_value(g.tenant_id, 'exchange_fee')
                 order.exchange_fee = exchange_fee
                 order.total_amount = exchange_fee
                 order.pricing_snapshot = {

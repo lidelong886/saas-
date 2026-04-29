@@ -9,7 +9,7 @@
       </view>
     </view>
     <view class="product-title">{{battery.modelName || battery.model}}</view>
-    <view class="product-code">官方编号 {{battery.batteryCode || battery.battery_code}}</view>
+    <view class="product-code">按规格售卖，支付后自动分配同类电池</view>
   </view>
 
   <view class="info-card price-card">
@@ -17,7 +17,7 @@
       <text class="muted">官方到手价</text>
       <view><text class="currency">¥</text><text class="price">{{battery.displayPrice}}</text></view>
     </view>
-    <view class="stock-badge">现货可购</view>
+    <view class="stock-badge">库存 {{battery.stock}} 件</view>
   </view>
 
   <view class="info-card">
@@ -32,8 +32,8 @@
         <text class="spec-label">额定容量</text>
       </view>
       <view class="spec-item">
-        <text class="spec-value">{{battery.powerLevel}}%</text>
-        <text class="spec-label">交付电量</text>
+        <text class="spec-value">{{battery.avgPowerLevel || battery.powerLevel}}%</text>
+        <text class="spec-label">平均电量</text>
       </view>
       <view class="spec-item">
         <text class="spec-value">¥{{battery.depositDisplay}}</text>
@@ -44,9 +44,9 @@
 
   <view class="info-card">
     <view class="card-title">服务承诺</view>
-    <view class="service-line"><text>✓</text><text>官方认证电池，购买后自动绑定到“我的专属电池”</text></view>
+    <view class="service-line"><text>✓</text><text>官方认证电池，购买后自动从该规格库存分配实物电池</text></view>
     <view class="service-line"><text>✓</text><text>24个月质保，同城站点售后响应</text></view>
-    <view class="service-line"><text>✓</text><text>出库前完成容量、电压、外观和安全检测</text></view>
+    <view class="service-line"><text>✓</text><text>购买后可在公共充电桩给专属电池低价充电</text></view>
   </view>
 
   <view class="bottom-bar">

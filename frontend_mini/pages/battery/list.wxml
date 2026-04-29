@@ -46,6 +46,9 @@
       <view class="normal-info" wx:else>
         <text class="meta">当前电量: <text class="highlight">{{item.power_level != null ? item.power_level + '%' : '-'}}</text></text>
         <text class="meta desc">您可以将其放入任意空闲电柜进行便宜充电，不对外出租</text>
+        <view class="actions">
+          <button class="btn btn-primary" data-battery="{{item}}" catchtap="onChargeTap">公共充电桩充电</button>
+        </view>
       </view>
     </view>
   </view>

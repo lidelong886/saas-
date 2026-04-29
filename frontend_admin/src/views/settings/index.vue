@@ -4,7 +4,7 @@
     <div class="page-header">
       <div>
         <h1 class="page-title">系统设置</h1>
-        <p class="page-subtitle">管理平台基础配置、支付密钥与地图服务</p>
+        <p class="page-subtitle">管理支付密钥与地图服务</p>
       </div>
     </div>
 
@@ -24,78 +24,6 @@
 
     <!-- 设置卡片 -->
     <div class="settings-grid">
-      <!-- 基础设置 -->
-      <div class="settings-card">
-        <div class="card-header">
-          <div class="card-icon basic-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-          </div>
-          <div>
-            <h3 class="card-title">基础设置</h3>
-            <p class="card-desc">平台运行参数与租金属性</p>
-          </div>
-        </div>
-
-        <div class="card-body">
-          <div class="field-row">
-            <label class="field-label">系统名称</label>
-            <el-input v-model="basicSettings.systemName" placeholder="平台展示名称" class="modern-input" />
-          </div>
-
-          <div class="field-row">
-            <label class="field-label">默认租户 ID</label>
-            <el-input v-model="basicSettings.defaultTenant" placeholder="默认租户" class="modern-input" />
-          </div>
-
-          <div class="field-row">
-            <label class="field-label">租赁单价</label>
-            <div class="field-unit-wrap">
-              <el-input-number v-model="basicSettings.rental_price_per_hour" :min="0" :precision="2" :step="0.1" class="modern-number" />
-              <span class="field-unit">元 / 小时</span>
-            </div>
-          </div>
-
-          <div class="field-row">
-            <label class="field-label">超时费率</label>
-            <div class="field-unit-wrap">
-              <el-input-number v-model="basicSettings.overtime_rate" :min="0" :precision="2" :step="0.1" class="modern-number" />
-              <span class="field-unit">元 / 小时</span>
-            </div>
-          </div>
-
-          <div class="field-row">
-            <label class="field-label">押金金额</label>
-            <div class="field-unit-wrap">
-              <el-input-number v-model="basicSettings.deposit_amount" :min="0" :precision="2" :step="1" class="modern-number" />
-              <span class="field-unit">元</span>
-            </div>
-          </div>
-
-          <div class="field-row">
-            <label class="field-label">换电费用</label>
-            <div class="field-unit-wrap">
-              <el-input-number v-model="basicSettings.exchange_fee" :min="0" :precision="2" :step="1" class="modern-number" />
-              <span class="field-unit">元 / 次</span>
-            </div>
-          </div>
-
-          <div class="field-row">
-            <label class="field-label">订单超时</label>
-            <div class="field-unit-wrap">
-              <el-input-number v-model="basicSettings.order_timeout_minutes" :min="1" :step="1" class="modern-number" />
-              <span class="field-unit">分钟</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-footer">
-          <el-button type="primary" class="btn-primary" @click="saveBasicSettings" :loading="saving.basic">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            保存基础设置
-          </el-button>
-        </div>
-      </div>
-
       <!-- 支付设置 -->
       <div class="settings-card">
         <div class="card-header">
@@ -220,19 +148,10 @@ export default {
   name: 'Settings',
   data() {
     return {
-      saving: { basic: false, payment: false, map: false },
+      saving: { payment: false, map: false },
       showAppId: false,
       showMchId: false,
       showMapKey: false,
-      basicSettings: {
-        systemName: '电池SaaS平台',
-        defaultTenant: '1',
-        rental_price_per_hour: 0.5,
-        overtime_rate: 1.5,
-        deposit_amount: 50.0,
-        exchange_fee: 3.0,
-        order_timeout_minutes: 15
-      },
       paymentSettings: {
         wechatAppId: '',
         wechatMchId: ''
@@ -256,16 +175,6 @@ export default {
   methods: {
     applySettings(data) {
       if (!data) return
-      this.basicSettings = {
-        ...this.basicSettings,
-        systemName: data.systemName || this.basicSettings.systemName,
-        defaultTenant: String(data.defaultTenant || this.basicSettings.defaultTenant),
-        rental_price_per_hour: data.rental_price_per_hour,
-        overtime_rate: data.overtime_rate,
-        deposit_amount: data.deposit_amount,
-        exchange_fee: data.exchange_fee,
-        order_timeout_minutes: data.order_timeout_minutes
-      }
       this.paymentSettings = {
         wechatAppId: data.wechatAppId || '',
         wechatMchId: data.wechatMchId || ''
@@ -286,20 +195,6 @@ export default {
       } catch (e) {
         console.error('加载设置失败', e)
         ElMessage.error('加载设置失败: ' + (e?.message || e?.response?.data?.message || ''))
-      }
-    },
-    async saveBasicSettings() {
-      this.saving.basic = true
-      try {
-        const res = await updateSettings(this.basicSettings)
-        if (res && (res.code === 0 || res.code === 200)) {
-          this.applySettings(res.data || {})
-        }
-        ElMessage.success('基础设置保存成功')
-      } catch (e) {
-        ElMessage.error('保存失败: ' + (e?.message || ''))
-      } finally {
-        this.saving.basic = false
       }
     },
     async savePaymentSettings() {
@@ -414,7 +309,6 @@ export default {
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.basic-icon { background: #eef2ff; color: #6366f1; }
 .payment-icon { background: #d1fae5; color: #10b981; }
 .map-icon { background: #fef3c7; color: #f59e0b; }
 .card-title { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }

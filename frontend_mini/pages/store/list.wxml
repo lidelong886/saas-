@@ -6,8 +6,8 @@
     <view class="hero-top">
       <view>
         <view class="eyebrow">PowerNest Official Store</view>
-        <view class="hero-title">专属电池商城</view>
-        <view class="hero-subtitle">官方认证电池 · 满电检测交付 · 同城售后保障</view>
+        <view class="hero-title">电池品类商城</view>
+        <view class="hero-subtitle">按规格购买 · 自动分配同类电池 · 支持公共充电桩充电</view>
       </view>
       <view class="hero-badge">直营</view>
     </view>
@@ -30,7 +30,7 @@
   <view class="search-panel">
     <view class="search-box">
       <text class="search-icon">⌕</text>
-      <input value="{{keyword}}" placeholder="搜索型号、编号或站点" bindinput="onSearchInput" confirm-type="search" />
+      <input value="{{keyword}}" placeholder="搜索 60V、72V、24Ah、36Ah" bindinput="onSearchInput" confirm-type="search" />
       <text class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</text>
     </view>
     <view class="filter-title">按电压分类</view>
@@ -49,8 +49,8 @@
 
   <view class="section-head">
     <view>
-      <text class="section-title">精选现货</text>
-      <text class="section-subtitle">{{filteredBatteries.length}} 款可购买电池</text>
+      <text class="section-title">规格品类</text>
+      <text class="section-subtitle">{{filteredBatteries.length}} 类可购买电池</text>
     </view>
     <text class="section-link">正品保障</text>
   </view>
@@ -73,15 +73,15 @@
             <text class="tag">{{item.sellingPoint}}</text>
           </view>
           <view class="product-name">{{item.modelName}}</view>
-          <view class="product-code">编号 {{item.batteryCode}}</view>
+          <view class="product-code">系统将从该规格库存中自动分配电池</view>
           <view class="spec-grid">
             <view class="spec-item">
               <text class="spec-value">{{item.capacityDisplay}}</text>
               <text class="spec-label">额定容量</text>
             </view>
             <view class="spec-item">
-              <text class="spec-value">{{item.powerLevel}}%</text>
-              <text class="spec-label">当前电量</text>
+              <text class="spec-value">{{item.stock}} 件</text>
+              <text class="spec-label">可售库存</text>
             </view>
             <view class="spec-item">
               <text class="spec-value">{{item.warrantyText}}</text>
@@ -93,7 +93,7 @@
       <view class="service-strip">
         <text>✓ 原厂检测</text>
         <text>✓ {{item.serviceText}}</text>
-        <text>✓ 购买后绑定到我的电池</text>
+        <text>✓ 购买后绑定到我的专属电池</text>
       </view>
       <view class="product-footer">
         <view class="price-block">

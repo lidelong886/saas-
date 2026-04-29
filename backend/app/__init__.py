@@ -266,13 +266,21 @@ def create_app(config_name='development'):
 
     with app.app_context():
         try:
-            db.create_all()
-            from .utils.demo_seed import ensure_demo_data
-            ensure_demo_data(app)
-            app.logger.info('数据库表创建成功')
+            if app.config.get('AUTO_CREATE_TABLES', False):
+                db.create_all()
+                app.logger.info('数据库表自动创建完成')
+            else:
+                app.logger.info('已跳过自动建表，请使用迁移脚本管理数据库结构')
+
+            if app.config.get('ENABLE_DEMO_DATA', False):
+                from .utils.demo_seed import ensure_demo_data
+                ensure_demo_data(app)
+                app.logger.info('演示数据初始化完成')
+            else:
+                app.logger.info('已跳过演示数据初始化')
         except Exception as e:
-            app.logger.error(f'数据库表创建失败: {str(e)}')
-            app.logger.error('请检查数据库连接配置或确保数据库服务正在运行')
+            app.logger.error(f'数据库初始化失败: {str(e)}')
+            app.logger.error('请检查数据库连接配置、迁移状态或演示数据开关')
             if not app.config.get('DEBUG'):
                 raise
 

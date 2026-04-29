@@ -220,7 +220,9 @@ export default {
         }
         this.dialogVisible = false
         this.loadUsers()
-      } catch {}
+      } catch {
+        // 表单校验失败或接口层已统一提示。
+      }
       finally { this.submitting = false }
     },
     async toggleStatus(row) {
@@ -228,7 +230,9 @@ export default {
         await toggleUserStatus(row.id, !row.is_active)
         ElMessage.success(row.is_active ? '已禁用' : '已启用')
         this.loadUsers()
-      } catch {}
+      } catch {
+        // 接口层已统一提示。
+      }
     },
     handleDelete(row) {
       ElMessageBox.confirm(`确定删除用户"${row.username}"吗？`, '提示', { type: 'warning' })

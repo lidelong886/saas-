@@ -4,6 +4,8 @@
 from flask import Blueprint, request, g
 
 from ..models import Tenant, TenantApplication, Role, Permission, AdminUser, User, Station, Battery, Notification
+from .. import db
+from ..services.tenant_config_service import TenantConfigService
 from ..utils.admin_auth import admin_required
 from ..utils.response import success_response, error_response
 
@@ -34,6 +36,7 @@ def get_tenants():
             tenant_data['user_count'] = User.query.filter_by(tenant_id=tenant.id, is_deleted=False).count()
             tenant_data['station_count'] = Station.query.filter_by(tenant_id=tenant.id, is_deleted=False).count()
             tenant_data['battery_count'] = Battery.query.filter_by(tenant_id=tenant.id, is_deleted=False).count()
+            tenant_data.update(TenantConfigService.get_settings(tenant.id))
             tenants.append(tenant_data)
         return success_response(tenants, '获取租户列表成功')
     except Exception as e:
@@ -62,7 +65,9 @@ def create_tenant():
             remarks=data.get('remarks'),
             tenant_id=1
         )
-        tenant.save()
+        db.session.add(tenant)
+        db.session.flush()
+        TenantConfigService.set_settings(tenant.id, data)
 
         # 初始化租户管理员角色
         admin_role = Role(
@@ -75,7 +80,7 @@ def create_tenant():
         # 关联所有现有权限（如果是租户级别）
         permissions = Permission.query.all()
         admin_role.permissions = permissions
-        admin_role.save()
+        db.session.add(admin_role)
 
         # 初始化租户超级管理员账号
         if data.get('admin_phone') and data.get('admin_password'):
@@ -88,11 +93,80 @@ def create_tenant():
                 tenant_id=tenant.id
             )
             new_admin.roles.append(admin_role)
-            new_admin.save()
+            db.session.add(new_admin)
 
+        db.session.commit()
         return success_response(tenant.to_dict(), '创建租户并初始化管理员成功')
     except Exception as e:
+        db.session.rollback()
         return error_response(f'创建租户失败: {str(e)}', 500)
+
+
+@rbac_bp.route('/tenants/<int:tenant_id>', methods=['PUT'])
+@admin_required()
+def update_tenant(tenant_id):
+    try:
+        if g.tenant_id != 1:
+            return error_response('只有系统管理员可以管理租户', 403)
+        tenant = Tenant.query.filter_by(id=tenant_id, is_deleted=False).first()
+        if not tenant:
+            return error_response('租户不存在', 404)
+
+        data = request.get_json() or {}
+        if data.get('code') and data['code'] != tenant.code:
+            exists = Tenant.query.filter(
+                Tenant.code == data['code'],
+                Tenant.id != tenant_id,
+                Tenant.is_deleted == False
+            ).first()
+            if exists:
+                return error_response('租户编码已存在', 400)
+
+        if data.get('name') and data['name'] != tenant.name:
+            exists = Tenant.query.filter(
+                Tenant.name == data['name'],
+                Tenant.id != tenant_id,
+                Tenant.is_deleted == False
+            ).first()
+            if exists:
+                return error_response('租户名称已存在', 400)
+
+        for field in [
+            'name', 'code', 'brand_name', 'brand_logo', 'contact_name',
+            'contact_phone', 'contact_email', 'status', 'max_users',
+            'max_stations', 'max_batteries', 'remarks'
+        ]:
+            if field in data:
+                setattr(tenant, field, data.get(field))
+
+        TenantConfigService.set_settings(tenant.id, data)
+
+        db.session.commit()
+        result = tenant.to_dict()
+        result.update(TenantConfigService.get_settings(tenant.id))
+        return success_response(result, '租户更新成功')
+    except Exception as e:
+        db.session.rollback()
+        return error_response(f'更新租户失败: {str(e)}', 500)
+
+
+@rbac_bp.route('/tenants/<int:tenant_id>', methods=['DELETE'])
+@admin_required()
+def delete_tenant(tenant_id):
+    try:
+        if g.tenant_id != 1:
+            return error_response('只有系统管理员可以管理租户', 403)
+        if tenant_id == 1:
+            return error_response('默认系统租户不能删除', 400)
+        tenant = Tenant.query.filter_by(id=tenant_id, is_deleted=False).first()
+        if not tenant:
+            return error_response('租户不存在', 404)
+        tenant.is_deleted = True
+        db.session.commit()
+        return success_response(None, '租户删除成功')
+    except Exception as e:
+        db.session.rollback()
+        return error_response(f'删除租户失败: {str(e)}', 500)
 
 
 @rbac_bp.route('/tenant-applications', methods=['GET'])
@@ -182,40 +256,6 @@ def review_tenant_application(application_id):
         from .. import db
         db.session.rollback()
         return error_response(f'审核入驻申请失败: {str(e)}', 500)
-
-
-@rbac_bp.route('/tenants/<int:tenant_id>', methods=['PUT'])
-@admin_required()
-def update_tenant(tenant_id):
-    try:
-        if g.tenant_id != 1:
-            return error_response('只有系统管理员可以管理租户', 403)
-        tenant = Tenant.query.filter_by(id=tenant_id, is_deleted=False).first()
-        if not tenant:
-            return error_response('租户不存在', 404)
-        data = request.get_json() or {}
-        for field in ['name', 'code', 'contact_name', 'contact_phone', 'contact_email', 'status', 'max_users', 'max_stations', 'max_batteries', 'remarks']:
-            if field in data:
-                setattr(tenant, field, data[field])
-        tenant.save()
-        return success_response(tenant.to_dict(), '更新租户成功')
-    except Exception as e:
-        return error_response(f'更新租户失败: {str(e)}', 500)
-
-
-@rbac_bp.route('/tenants/<int:tenant_id>', methods=['DELETE'])
-@admin_required()
-def delete_tenant(tenant_id):
-    try:
-        if g.tenant_id != 1:
-            return error_response('只有系统管理员可以管理租户', 403)
-        tenant = Tenant.query.filter_by(id=tenant_id, is_deleted=False).first()
-        if not tenant:
-            return error_response('租户不存在', 404)
-        tenant.soft_delete()
-        return success_response(None, '删除租户成功')
-    except Exception as e:
-        return error_response(f'删除租户失败: {str(e)}', 500)
 
 
 @rbac_bp.route('/roles', methods=['GET'])

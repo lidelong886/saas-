@@ -2,13 +2,44 @@
 数据统计服务
 """
 from datetime import datetime, timedelta
-from flask import g
+from flask import g, request
+from flask_jwt_extended import get_jwt
 from ..models import Order, User, Battery, ExchangeRecord, Payment, Station
 from .. import db
 from sqlalchemy import func, case
 
 class StatisticsService:
     """数据统计服务类"""
+
+    @staticmethod
+    def _is_global_admin_scope():
+        try:
+            claims = get_jwt()
+        except Exception:
+            claims = {}
+        return bool(claims.get('is_super_admin')) or getattr(g, 'tenant_id', 1) == 1
+
+    @staticmethod
+    def _scoped_query(model):
+        query = model.query.filter_by(is_deleted=False)
+        if StatisticsService._is_global_admin_scope():
+            tenant_id = request.args.get('tenant_id', type=int)
+            if tenant_id:
+                query = query.filter(model.tenant_id == tenant_id)
+        else:
+            query = query.filter(model.tenant_id == g.tenant_id)
+        return query
+
+    @staticmethod
+    def _apply_scope(query, model):
+        query = query.filter(model.is_deleted == False)
+        if StatisticsService._is_global_admin_scope():
+            tenant_id = request.args.get('tenant_id', type=int)
+            if tenant_id:
+                query = query.filter(model.tenant_id == tenant_id)
+        else:
+            query = query.filter(model.tenant_id == g.tenant_id)
+        return query
 
     @staticmethod
     def get_revenue_statistics(start_date=None, end_date=None, period='day'):
@@ -38,12 +69,10 @@ class StatisticsService:
                 end_date = datetime.now().date()
 
             # 获取完成的订单
-            completed_orders = Order.query.filter(
+            completed_orders = StatisticsService._apply_scope(Order.query, Order).filter(
                 Order.status == 'completed',
                 Order.created_at >= start_date,
-                Order.created_at <= end_date,
-                Order.tenant_id == g.tenant_id,
-                Order.is_deleted == False
+                Order.created_at <= end_date
             ).all()
 
             total_revenue = sum(float(order.total_amount or 0) for order in completed_orders)
@@ -94,11 +123,9 @@ class StatisticsService:
             if not end_date:
                 end_date = datetime.now().date()
 
-            query = Order.query.filter(
+            query = StatisticsService._apply_scope(Order.query, Order).filter(
                 Order.created_at >= start_date,
-                Order.created_at <= end_date,
-                Order.tenant_id == g.tenant_id,
-                Order.is_deleted == False
+                Order.created_at <= end_date
             )
 
             total_orders = query.count()
@@ -150,36 +177,23 @@ class StatisticsService:
             电池统计数据
         """
         try:
-            total_batteries = Battery.query.filter_by(
-                tenant_id=g.tenant_id,
-                is_deleted=False
-            ).count()
+            battery_query = StatisticsService._scoped_query(Battery)
+            total_batteries = battery_query.count()
 
-            available_batteries = Battery.query.filter_by(
-                status='available',
-                tenant_id=g.tenant_id,
-                is_deleted=False
-            ).count()
+            available_batteries = StatisticsService._scoped_query(Battery).filter(Battery.status == 'available').count()
 
-            rented_batteries = Battery.query.filter(
-                Battery.status.in_(['rented', 'in_use', 'charging']),
-                Battery.tenant_id == g.tenant_id,
-                Battery.is_deleted == False
-            ).count()
+            rented_batteries = StatisticsService._scoped_query(Battery).filter(Battery.status.in_(['rented', 'in_use', 'charging'])).count()
 
-            maintenance_batteries = Battery.query.filter_by(
-                status='maintenance',
-                tenant_id=g.tenant_id,
-                is_deleted=False
-            ).count()
+            maintenance_batteries = StatisticsService._scoped_query(Battery).filter(Battery.status == 'maintenance').count()
+            offline_batteries = StatisticsService._scoped_query(Battery).filter(Battery.status.in_(['offline', 'scrapped'])).count()
 
             # 计算使用率
             utilization_rate = (rented_batteries / total_batteries * 100) if total_batteries > 0 else 0
 
             # 获取电池平均电量
-            avg_power = db.session.query(func.avg(Battery.power_level)).filter(
-                Battery.tenant_id == g.tenant_id,
-                Battery.is_deleted == False
+            avg_power = StatisticsService._apply_scope(
+                db.session.query(func.avg(Battery.power_level)),
+                Battery
             ).scalar() or 0
 
             return {
@@ -187,6 +201,7 @@ class StatisticsService:
                 'available_batteries': available_batteries,
                 'rented_batteries': rented_batteries,
                 'maintenance_batteries': maintenance_batteries,
+                'offline_batteries': offline_batteries,
                 'utilization_rate': round(utilization_rate, 2),
                 'average_power_level': round(float(avg_power), 2)
             }
@@ -197,6 +212,7 @@ class StatisticsService:
                 'available_batteries': 0,
                 'rented_batteries': 0,
                 'maintenance_batteries': 0,
+                'offline_batteries': 0,
                 'utilization_rate': 0,
                 'average_power_level': 0,
                 'error': str(e)
@@ -211,28 +227,18 @@ class StatisticsService:
             用户统计数据
         """
         try:
-            total_users = User.query.filter_by(
-                tenant_id=g.tenant_id,
-                is_deleted=False
-            ).count()
+            user_query = StatisticsService._scoped_query(User)
+            total_users = user_query.count()
 
-            active_users = User.query.filter(
+            active_users = StatisticsService._scoped_query(User).filter(
                 User.last_login_at >= datetime.now() - timedelta(days=30),
-                User.tenant_id == g.tenant_id,
-                User.is_deleted == False
             ).count()
 
-            verified_users = User.query.filter_by(
-                is_verified=True,
-                tenant_id=g.tenant_id,
-                is_deleted=False
-            ).count()
+            verified_users = StatisticsService._scoped_query(User).filter(User.is_verified == True).count()
 
             # 获取新用户（最近7天）
-            new_users = User.query.filter(
+            new_users = StatisticsService._scoped_query(User).filter(
                 User.created_at >= datetime.now() - timedelta(days=7),
-                User.tenant_id == g.tenant_id,
-                User.is_deleted == False
             ).count()
 
             return {
@@ -259,47 +265,46 @@ class StatisticsService:
             today = datetime.now().date()
             this_month = today.replace(day=1)
 
-            today_orders = Order.query.filter(
+            today_orders = StatisticsService._scoped_query(Order).filter(
                 Order.created_at >= today,
-                Order.tenant_id == g.tenant_id,
-                Order.is_deleted == False
             ).count()
-            total_orders = Order.query.filter(
-                Order.tenant_id == g.tenant_id,
-                Order.is_deleted == False
-            ).count()
+            total_orders = StatisticsService._scoped_query(Order).count()
 
-            today_revenue = db.session.query(func.sum(Order.total_amount)).filter(
+            today_revenue = StatisticsService._apply_scope(
+                db.session.query(func.sum(Order.total_amount)),
+                Order
+            ).filter(
                 Order.status == 'completed',
-                Order.created_at >= today,
-                Order.tenant_id == g.tenant_id,
-                Order.is_deleted == False
+                Order.created_at >= today
             ).scalar() or 0
-            month_revenue = db.session.query(func.sum(Order.total_amount)).filter(
+            month_revenue = StatisticsService._apply_scope(
+                db.session.query(func.sum(Order.total_amount)),
+                Order
+            ).filter(
                 Order.status == 'completed',
-                Order.created_at >= this_month,
-                Order.tenant_id == g.tenant_id,
-                Order.is_deleted == False
+                Order.created_at >= this_month
             ).scalar() or 0
 
-            station_total = Station.query.filter_by(tenant_id=g.tenant_id, is_deleted=False).count()
-            station_active = Station.query.filter_by(tenant_id=g.tenant_id, status='active', is_deleted=False).count()
+            station_query = StatisticsService._scoped_query(Station)
+            station_total = station_query.count()
+            station_active = StatisticsService._scoped_query(Station).filter(Station.status == 'active').count()
             station_stats = {
                 'total_stations': station_total,
                 'active_stations': station_active,
                 'inactive_stations': max(station_total - station_active, 0)
             }
 
-            station_usage_rows = db.session.query(
+            station_usage_query = db.session.query(
                 Station.name,
                 func.count(Battery.id).label('total'),
                 func.sum(case((Battery.status.in_(['rented', 'in_use', 'charging']), 1), else_=0)).label('busy')
             ).outerjoin(
                 Battery,
                 (Battery.current_station_id == Station.id) & (Battery.is_deleted == False)
-            ).filter(
-                Station.tenant_id == g.tenant_id,
-                Station.is_deleted == False
+            )
+            station_usage_rows = StatisticsService._apply_scope(
+                station_usage_query,
+                Station
             ).group_by(Station.id, Station.name).all()
             station_usage = []
             for row in station_usage_rows:
@@ -317,21 +322,20 @@ class StatisticsService:
             revenue_trend = []
             for i in range(6, -1, -1):
                 date = today - timedelta(days=i)
-                daily_revenue = db.session.query(func.sum(Order.total_amount)).filter(
+                daily_revenue = StatisticsService._apply_scope(
+                    db.session.query(func.sum(Order.total_amount)),
+                    Order
+                ).filter(
                     Order.status == 'completed',
-                    func.date(Order.created_at) == date,
-                    Order.tenant_id == g.tenant_id,
-                    Order.is_deleted == False
+                    func.date(Order.created_at) == date
                 ).scalar() or 0
                 revenue_trend.append(round(float(daily_revenue), 2))
 
             order_trend = []
             for i in range(29, -1, -1):
                 date = today - timedelta(days=i)
-                daily_orders = Order.query.filter(
+                daily_orders = StatisticsService._scoped_query(Order).filter(
                     func.date(Order.created_at) == date,
-                    Order.tenant_id == g.tenant_id,
-                    Order.is_deleted == False
                 ).count()
                 order_trend.append(daily_orders)
 

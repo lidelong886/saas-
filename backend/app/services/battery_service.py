@@ -6,6 +6,7 @@ from flask import g, current_app
 from ..models import Battery, Station, Cabinet, Order
 from ..models import UserPackage, Package
 from .. import db
+from .tenant_config_service import TenantConfigService
 
 
 class BatteryService:
@@ -115,8 +116,9 @@ class BatteryService:
                 }
             else:
                 # ===== 无套餐：正常创建待支付订单 =====
-                rental_fee = float(battery.rental_price_per_hour) * hours
-                deposit_fee = float(battery.deposit_amount)
+                unit_price = float(battery.rental_price_per_hour or TenantConfigService.get_value(g.tenant_id, 'rental_price_per_hour'))
+                rental_fee = unit_price * hours
+                deposit_fee = float(battery.deposit_amount or TenantConfigService.get_value(g.tenant_id, 'deposit_amount'))
 
                 order = Order(
                     order_type='rental',
@@ -125,12 +127,14 @@ class BatteryService:
                     station_id=order_station_id,
                     cabinet_id=order_cabinet_id,
                     rental_hours=hours,
-                    unit_price=battery.rental_price_per_hour,
+                    unit_price=unit_price,
                     rental_fee=rental_fee,
                     deposit_fee=deposit_fee,
                     total_amount=rental_fee + deposit_fee,
                     source='miniapp',
-                    timeout_cancel_at=datetime.now() + timedelta(minutes=15),
+                    timeout_cancel_at=datetime.now() + timedelta(
+                        minutes=TenantConfigService.get_value(g.tenant_id, 'order_timeout_minutes')
+                    ),
                     pricing_snapshot={
                         'battery_id': battery_id,
                         'hours': hours,

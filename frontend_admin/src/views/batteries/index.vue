@@ -439,7 +439,9 @@ export default {
         }
         this.dialogVisible = false
         this.loadBatteries()
-      } catch {} finally { this.submitting = false }
+      } catch {
+        // 表单校验失败或接口层已统一提示。
+      } finally { this.submitting = false }
     },
     handleDelete(row) {
       ElMessageBox.confirm(`确定删除电池"${row.battery_code}"吗？`, '提示', { type: 'warning' })
@@ -447,7 +449,9 @@ export default {
           await deleteBattery(row.id)
           ElMessage.success('删除成功')
           this.loadBatteries()
-        }).catch(() => {})
+        }).catch(() => {
+          // 用户取消删除。
+        })
     },
     getStatusLabel(status) {
       return { available: '可用', rented: '租用中', charging: '充电中', maintenance: '维护中', scrapped: '报废' }[status] || status

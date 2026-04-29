@@ -1,4 +1,5 @@
 const { getBatteries } = require('../../api/battery')
+const { getStations } = require('../../api/station')
 const request = require('../../utils/request')
 
 Page({
@@ -109,6 +110,45 @@ Page({
 
   goToBuyBattery() {
     wx.navigateTo({ url: '/pages/store/list' })
+  },
+
+  onChargeTap(e) {
+    const battery = e.currentTarget.dataset.battery
+    if (!battery || !battery.id) return
+    wx.showLoading({ title: '加载站点...' })
+    getStations({ limit: 20 }).then(res => {
+      wx.hideLoading()
+      const data = res.data || {}
+      const stations = data.stations || []
+      const usableStations = stations.filter(item => item.status === 'active')
+      if (!usableStations.length) {
+        wx.showToast({ title: '暂无可用公共充电桩', icon: 'none' })
+        return
+      }
+      wx.showActionSheet({
+        itemList: usableStations.slice(0, 6).map(item => item.name),
+        success: action => {
+          const station = usableStations[action.tapIndex]
+          this.startPublicCharge(battery.id, station.id)
+        }
+      })
+    }).catch(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '站点加载失败', icon: 'none' })
+    })
+  },
+
+  startPublicCharge(batteryId, stationId) {
+    wx.showLoading({ title: '提交充电...' })
+    request.post(`/battery/my/${batteryId}/charge`, { station_id: stationId }).then(() => {
+      wx.hideLoading()
+      wx.showToast({ title: '已开始充电', icon: 'success' })
+      this.load()
+    }).catch(err => {
+      wx.hideLoading()
+      const msg = err && (err.message || err.msg) || '充电失败'
+      wx.showToast({ title: msg, icon: 'none' })
+    })
   },
 
   onTap(e) {

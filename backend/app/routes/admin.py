@@ -10,6 +10,7 @@ from ..utils.response import success_response, error_response, paginate_response
 from ..utils.operation_log import log_admin_action
 from ..utils.amap import AMapService
 from ..services.payment_service import PaymentService
+from ..services.tenant_config_service import TenantConfigService
 from datetime import datetime, timedelta
 from sqlalchemy import func, case, extract
 import random
@@ -54,13 +55,6 @@ def attach_tenant_name(item):
     return item
 
 SYSTEM_SETTINGS = {
-    'systemName': '电池SaaS平台',
-    'defaultTenant': '1',
-    'rental_price_per_hour': 0.5,
-    'overtime_rate': 1.5,
-    'deposit_amount': 50.0,
-    'exchange_fee': 3.0,
-    'order_timeout_minutes': 15,
     'wechatAppId': '',
     'wechatMchId': '',
     'amapKey': ''
@@ -483,8 +477,14 @@ def create_battery():
             voltage=data.get('voltage'),
             temperature=data.get('temperature'),
             current_station_id=station_id,
-            rental_price_per_hour=data.get('rental_price_per_hour', 0.50),
-            deposit_amount=data.get('deposit_amount', 50.00),
+            rental_price_per_hour=data.get(
+                'rental_price_per_hour',
+                TenantConfigService.get_value(tenant_id, 'rental_price_per_hour')
+            ),
+            deposit_amount=data.get(
+                'deposit_amount',
+                TenantConfigService.get_value(tenant_id, 'deposit_amount')
+            ),
             selling_price=data.get('selling_price'),
             tenant_id=tenant_id
         )
