@@ -116,7 +116,7 @@
     <view class="smart-recommend-inner">
       <text class="smart-label">智能推荐</text>
       <text class="smart-station-name">{{smartRecommend.name}}</text>
-      <text class="smart-detail">可用 {{smartRecommend.available_batteries}} 台 · {{smartRecommend.distance || '?'}}m</text>
+      <text class="smart-detail">可用 {{smartRecommend.available_batteries}} 台{{smartRecommend.distance_text ? ' · ' + smartRecommend.distance_text : ''}}</text>
     </view>
     <text class="smart-go">前往</text>
   </view>

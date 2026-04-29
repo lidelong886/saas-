@@ -1,6 +1,6 @@
 // pages/exchange/exchange/exchange.js
 const { getUserStats } = require('../../../api/user')
-const { getNearbyStations } = require('../../../api/station')
+const { getNearbyStations, getStations } = require('../../../api/station')
 const { getStationBatteries } = require('../../../api/station')
 const { rentBattery, returnBattery } = require('../../../api/battery')
 const { exchangeBattery } = require('../../../api/exchange')
@@ -31,8 +31,9 @@ Page({
     confirming: false,
     // Shared
     loading: false,
-    latitude: 39.9042,
-    longitude: 116.4074,
+    latitude: null,
+    longitude: null,
+    hasRealLocation: false,
     error: '',
     exchangeError: '',
     canExchange: false,
@@ -128,16 +129,18 @@ Page({
       success: (res) => {
         this.setData({
           latitude: res.latitude,
-          longitude: res.longitude
+          longitude: res.longitude,
+          hasRealLocation: true
         })
         this.loadCurrentBattery()
       },
       fail: () => {
         wx.hideLoading()
-        wx.showToast({ title: '定位失败，将使用默认位置', icon: 'none' })
+        wx.showToast({ title: '定位失败，已隐藏距离信息', icon: 'none' })
         this.setData({
-          latitude: 39.9042,
-          longitude: 116.4074
+          latitude: null,
+          longitude: null,
+          hasRealLocation: false
         })
         this.loadCurrentBattery()
       }
@@ -202,15 +205,14 @@ Page({
 
   // Step 1: 加载附近站点
   loadNearbyStations() {
-    const { latitude, longitude } = this.data
+    const { latitude, longitude, hasRealLocation } = this.data
     this.setData({ stationLoading: true })
 
-    getNearbyStations({
-      latitude,
-      longitude,
-      radius: 10,
-      limit: 20
-    })
+    const requestTask = hasRealLocation && latitude != null && longitude != null
+      ? getNearbyStations({ latitude, longitude, radius: 10, limit: 20 })
+      : getStations({ limit: 20 })
+
+    requestTask
       .then(res => {
         const stations = (res.data || {}).stations || []
         console.log('加载到的站点:', stations)

@@ -2,6 +2,7 @@
 电池商城路由
 """
 from flask import Blueprint, request, g
+from sqlalchemy import asc, desc, case
 from flask_jwt_extended import jwt_required
 from ..utils.auth_helpers import get_current_user_id
 
@@ -13,12 +14,20 @@ store_bp = Blueprint('store', __name__)
 
 @store_bp.route('/list', methods=['GET'])
 def get_store_batteries():
-    """获取可售卖电池列表"""
+    """Get batteries available for sale."""
     try:
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
+        sort = request.args.get('sort', 'recommend')
+        voltage_type = request.args.get('voltage_type')
+        price_min = request.args.get('price_min', type=float)
+        price_max = request.args.get('price_max', type=float)
 
-        # 查找可售卖电池：目前设定为没有 owner 且有 deposit_amount 的电池
+        price_expr = case(
+            (Battery.selling_price > 0, Battery.selling_price),
+            else_=Battery.deposit_amount
+        )
+
         query = Battery.query.filter(
             Battery.tenant_id == g.tenant_id,
             Battery.is_deleted == False,
@@ -26,14 +35,37 @@ def get_store_batteries():
             Battery.status == 'available'
         )
 
+        if voltage_type:
+            query = query.filter(Battery.voltage_type == voltage_type)
+        if price_min is not None:
+            query = query.filter(price_expr >= price_min)
+        if price_max is not None:
+            query = query.filter(price_expr < price_max)
+
+        if sort == 'priceAsc':
+            query = query.order_by(asc(price_expr), desc(Battery.power_level), desc(Battery.created_at))
+        elif sort == 'priceDesc':
+            query = query.order_by(desc(price_expr), desc(Battery.power_level), desc(Battery.created_at))
+        elif sort == 'powerDesc':
+            query = query.order_by(desc(Battery.power_level), asc(price_expr), desc(Battery.created_at))
+        else:
+            query = query.order_by(desc(Battery.power_level), desc(Battery.created_at))
+
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        items = []
+        for item in pagination.items:
+            data = item.to_dict()
+            data['current_station_name'] = item.current_station.name if item.current_station else ''
+            items.append(data)
+
         return paginate_response(
-            [item.to_dict() for item in pagination.items],
+            items,
             {'total': pagination.total, 'page': pagination.page, 'per_page': pagination.per_page, 'pages': pagination.pages},
-            '获取商城列表成功'
+            'Get store list successfully'
         )
     except Exception as e:
-        return error_response(f'获取列表失败: {str(e)}', 500)
+        return error_response(f'Get store list failed: {str(e)}', 500)
+
 
 @store_bp.route('/purchase/<int:battery_id>', methods=['POST'])
 @jwt_required()

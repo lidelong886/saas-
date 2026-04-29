@@ -1,35 +1,120 @@
 <!--pages/store/list.wxml-->
-<view class="container">
-  <view class="header">
-    <text class="title">电池商店</text>
-    <text class="subtitle">购买属于自己的电池</text>
+<view class="store-page">
+  <view class="hero-card">
+    <view class="hero-glow hero-glow-a"></view>
+    <view class="hero-glow hero-glow-b"></view>
+    <view class="hero-top">
+      <view>
+        <view class="eyebrow">PowerNest Official Store</view>
+        <view class="hero-title">专属电池商城</view>
+        <view class="hero-subtitle">官方认证电池 · 满电检测交付 · 同城售后保障</view>
+      </view>
+      <view class="hero-badge">直营</view>
+    </view>
+    <view class="hero-stats">
+      <view class="hero-stat">
+        <text class="hero-stat-value">24月</text>
+        <text class="hero-stat-label">质保服务</text>
+      </view>
+      <view class="hero-stat">
+        <text class="hero-stat-value">100%</text>
+        <text class="hero-stat-label">官方验真</text>
+      </view>
+      <view class="hero-stat">
+        <text class="hero-stat-value">同城</text>
+        <text class="hero-stat-label">售后响应</text>
+      </view>
+    </view>
   </view>
 
-  <view class="battery-list" wx:if="{{batteries.length > 0}}">
-    <view class="battery-card" wx:for="{{batteries}}" wx:key="id">
-      <view class="battery-info" bindtap="onBatteryTap" data-battery="{{item}}">
-        <view class="battery-header">
-          <text class="battery-model">{{item.model}}</text>
-          <view class="battery-voltage-tag">{{item.voltage_type || '60V'}}</view>
+  <view class="search-panel">
+    <view class="search-box">
+      <text class="search-icon">⌕</text>
+      <input value="{{keyword}}" placeholder="搜索型号、编号或站点" bindinput="onSearchInput" confirm-type="search" />
+      <text class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</text>
+    </view>
+    <view class="filter-title">按电压分类</view>
+    <view class="tab-row">
+      <view class="chip {{activeVoltage === item.key ? 'active' : ''}}" wx:for="{{voltageTabs}}" wx:key="key" data-key="{{item.key}}" bindtap="switchVoltage">{{item.label}}</view>
+    </view>
+    <view class="filter-title price-title">按价格分类</view>
+    <view class="tab-row price-row">
+      <view class="chip price-chip {{activePrice === item.key ? 'active' : ''}}" wx:for="{{priceTabs}}" wx:key="key" data-key="{{item.key}}" bindtap="switchPrice">{{item.label}}</view>
+    </view>
+    <view class="sort-row">
+      <text class="sort-label">排序</text>
+      <view class="sort-chip {{sortMode === item.key ? 'active' : ''}}" wx:for="{{sortTabs}}" wx:key="key" data-key="{{item.key}}" bindtap="switchSort">{{item.label}}</view>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <view>
+      <text class="section-title">精选现货</text>
+      <text class="section-subtitle">{{filteredBatteries.length}} 款可购买电池</text>
+    </view>
+    <text class="section-link">正品保障</text>
+  </view>
+
+  <view class="product-list" wx:if="{{filteredBatteries.length > 0}}">
+    <view class="product-card {{item.isFeatured ? 'featured' : ''}}" wx:for="{{filteredBatteries}}" wx:key="id">
+      <view class="featured-ribbon" wx:if="{{item.isFeatured}}">旗舰推荐</view>
+      <view class="product-main" bindtap="onBatteryTap" data-battery="{{item}}">
+        <view class="product-visual">
+          <view class="battery-shell">
+            <view class="battery-cap"></view>
+            <view class="battery-fill" style="height: {{item.powerLevel}}%;"></view>
+            <text class="battery-percent">{{item.powerLevel}}%</text>
+          </view>
+          <view class="visual-shadow"></view>
         </view>
-        <view class="battery-specs">
-          <text class="spec-item">容量: {{item.capacity}}mAh</text>
-          <text class="spec-item">电量: {{item.power_level}}%</text>
+        <view class="product-info">
+          <view class="product-tags">
+            <text class="tag primary">{{item.voltageType}}</text>
+            <text class="tag">{{item.sellingPoint}}</text>
+          </view>
+          <view class="product-name">{{item.modelName}}</view>
+          <view class="product-code">编号 {{item.batteryCode}}</view>
+          <view class="spec-grid">
+            <view class="spec-item">
+              <text class="spec-value">{{item.capacityDisplay}}</text>
+              <text class="spec-label">额定容量</text>
+            </view>
+            <view class="spec-item">
+              <text class="spec-value">{{item.powerLevel}}%</text>
+              <text class="spec-label">当前电量</text>
+            </view>
+            <view class="spec-item">
+              <text class="spec-value">{{item.warrantyText}}</text>
+              <text class="spec-label">官方保障</text>
+            </view>
+          </view>
         </view>
-        <view class="battery-code">编号: {{item.battery_code}}</view>
       </view>
-      <view class="battery-action">
-        <view class="price-section">
-          <text class="price-label">售价</text>
-          <text class="price-value">¥{{item.selling_price || item.deposit_amount}}</text>
+      <view class="service-strip">
+        <text>✓ 原厂检测</text>
+        <text>✓ {{item.serviceText}}</text>
+        <text>✓ 购买后绑定到我的电池</text>
+      </view>
+      <view class="product-footer">
+        <view class="price-block">
+          <text class="price-label">到手价</text>
+          <view><text class="currency">¥</text><text class="price">{{item.displayPrice}}</text></view>
+          <text class="deposit">押金参考 ¥{{item.depositDisplay}}</text>
         </view>
-        <button class="buy-btn" bindtap="onPurchaseTap" data-battery="{{item}}">立即购买</button>
+        <button class="buy-btn" data-battery="{{item}}" bindtap="onPurchaseTap">立即购买</button>
       </view>
     </view>
   </view>
 
   <view class="empty-state" wx:else>
-    <text class="empty-icon">🔋</text>
-    <text class="empty-text">暂无可售电池</text>
+    <view class="empty-orb">🔋</view>
+    <text class="empty-title">暂无匹配商品</text>
+    <text class="empty-desc">换个筛选条件，或下拉刷新查看最新上架电池</text>
+    <button class="empty-btn" bindtap="clearSearch">重置筛选</button>
+  </view>
+
+  <view class="load-footer" wx:if="{{batteries.length > 0}}">
+    <text wx:if="{{isLoading}}">正在加载更多好物...</text>
+    <text wx:elif="{{!hasMore}}">已展示全部官方现货</text>
   </view>
 </view>

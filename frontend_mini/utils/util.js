@@ -17,11 +17,18 @@ const formatNumber = n => {
 
 // 格式化距离
 const formatDistance = distance => {
-  if (distance < 1000) {
-    return `${distance}m`
-  } else {
-    return `${(distance / 1000).toFixed(1)}km`
+  const meters = Number(distance)
+  if (!Number.isFinite(meters) || meters < 0) return ''
+  if (meters < 1000) {
+    return `${Math.round(meters)}m`
   }
+  return `${(meters / 1000).toFixed(1)}km`
+}
+
+const formatDistanceKm = distanceKm => {
+  const km = Number(distanceKm)
+  if (!Number.isFinite(km) || km < 0) return ''
+  return formatDistance(km * 1000)
 }
 
 // 格式化金额
@@ -278,6 +285,7 @@ module.exports = {
   formatTime,
   formatNumber,
   formatDistance,
+  formatDistanceKm,
   formatMoney,
   formatTimeAgo,
   formatOrderStatus,

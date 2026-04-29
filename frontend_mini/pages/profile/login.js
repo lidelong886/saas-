@@ -7,6 +7,18 @@ Page({
     loading: false
   },
 
+  onLoad() {
+    this.useDefaultTenant()
+  },
+
+  useDefaultTenant() {
+    const app = getApp()
+    if (app && app.globalData) {
+      app.globalData.tenantId = 1
+    }
+    wx.setStorageSync('selectedTenantId', 1)
+  },
+
   onUsernameInput(e) {
     this.setData({ username: (e.detail.value || '').trim() })
   },
@@ -25,6 +37,7 @@ Page({
 
     this.setData({ loading: true })
     try {
+      this.useDefaultTenant()
       const res = await login({ username: account, account, password })
       const resData = res.data || {}
       const token = resData.tokens && resData.tokens.access_token
@@ -43,7 +56,7 @@ Page({
         wx.navigateBack()
       }, 600)
     } catch (e) {
-      const msg = (e && (e.message || e.msg)) || '登录失败'
+      const msg = (e && (e.message || e.msg)) || '账号或密码错误'
       wx.showToast({ title: msg, icon: 'none' })
     } finally {
       this.setData({ loading: false })

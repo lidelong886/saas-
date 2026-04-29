@@ -8,7 +8,8 @@ Page({
     isLoading: false,
     hasMore: true,
     page: 1,
-    pageSize: 20
+    pageSize: 20,
+    recommendationLoaded: false
   },
 
   onShow() {
@@ -23,14 +24,18 @@ Page({
         const list = res.data && res.data.packages ? res.data.packages : []
         const newPackages = list.map(item => this.normalizePackage(item))
         this.setData({
-          recommendedPackages: newPackages
+          recommendedPackages: newPackages,
+          recommendationLoaded: true
         })
+        this.applyRecommendationFallback()
       }).catch(err => {
         console.error('加载推荐套餐失败:', err)
+        this.setData({ recommendationLoaded: true })
+        this.applyRecommendationFallback()
       })
     } else {
-      // 未登录可以清空，或者调用热门推荐
-      this.setData({ recommendedPackages: [] })
+      this.setData({ recommendedPackages: [], recommendationLoaded: true })
+      this.applyRecommendationFallback()
     }
   },
 
@@ -66,6 +71,7 @@ Page({
         hasMore: newPackages.length === this.data.pageSize,
         isLoading: false
       })
+      this.applyRecommendationFallback()
     }).catch((err) => {
       console.error('加载套餐失败:', err)
       this.setData({ isLoading: false })
@@ -95,6 +101,15 @@ Page({
 
   formatMoney(value) {
     return `¥${Number(value || 0).toFixed(2)}`
+  },
+
+  applyRecommendationFallback() {
+    if (this.data.recommendedPackages.length > 0) return
+    if (!this.data.recommendationLoaded) return
+    const fallback = this.data.packages.slice(0, 3)
+    if (fallback.length > 0) {
+      this.setData({ recommendedPackages: fallback })
+    }
   },
 
   onBuyTap(e) {

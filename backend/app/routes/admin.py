@@ -403,6 +403,7 @@ def get_batteries():
         per_page = request.args.get('per_page', 20, type=int)
         keyword = request.args.get('keyword', '')
         status = request.args.get('status', '')
+        voltage_type = request.args.get('voltage_type', '')
         station_id = request.args.get('station_id', type=int)
 
         query = scoped_admin_query(Battery)
@@ -413,6 +414,8 @@ def get_batteries():
             )
         if status:
             query = query.filter(Battery.status == status)
+        if voltage_type:
+            query = query.filter(Battery.voltage_type == voltage_type)
         if station_id:
             query = query.filter(Battery.current_station_id == station_id)
         query = query.order_by(Battery.created_at.desc())
@@ -469,13 +472,16 @@ def create_battery():
         if station_id:
             station = Station.query.filter_by(id=station_id, tenant_id=tenant_id, is_deleted=False).first()
             if not station:
-                return error_response('鎵€灞炵珯鐐逛笉灞炰簬閫夋嫨鐨勮繍钀ュ晢', 400)
+                return error_response('所属站点不属于选择的运营商', 400)
         battery_code = data.get('battery_code') or f"BAT{tenant_id:03d}{random.randint(100000, 999999)}"
         battery = Battery(
             battery_code=battery_code,
             model=data['model'],
             capacity=data['capacity'],
             power_level=data.get('power_level', 100),
+            voltage_type=data.get('voltage_type', '60V'),
+            voltage=data.get('voltage'),
+            temperature=data.get('temperature'),
             current_station_id=station_id,
             rental_price_per_hour=data.get('rental_price_per_hour', 0.50),
             deposit_amount=data.get('deposit_amount', 50.00),
@@ -505,11 +511,13 @@ def update_battery(battery_id):
             return error_response('电池不存在', 404)
         data = request.get_json()
         target_tenant_id = resolve_manage_tenant_id(data) if is_system_admin() and 'tenant_id' in data else battery.tenant_id
-        if 'current_station_id' in data and data.get('current_station_id'):
+        station_changed = 'current_station_id' in data and data.get('current_station_id') != battery.current_station_id
+        tenant_changed = is_system_admin() and 'tenant_id' in data and target_tenant_id != battery.tenant_id
+        if (station_changed or tenant_changed) and data.get('current_station_id'):
             station = Station.query.filter_by(id=data.get('current_station_id'), tenant_id=target_tenant_id, is_deleted=False).first()
             if not station:
-                return error_response('鎵€灞炵珯鐐逛笉灞炰簬閫夋嫨鐨勮繍钀ュ晢', 400)
-        for field in ['battery_code', 'model', 'capacity', 'power_level', 'status', 'current_station_id', 'rental_price_per_hour', 'deposit_amount', 'selling_price', 'voltage', 'temperature']:
+                return error_response('所属站点不属于选择的运营商', 400)
+        for field in ['battery_code', 'model', 'capacity', 'power_level', 'status', 'voltage_type', 'current_station_id', 'rental_price_per_hour', 'deposit_amount', 'selling_price', 'voltage', 'temperature']:
             if field in data:
                 setattr(battery, field, data[field])
         if 'battery_type' in data:

@@ -1,66 +1,70 @@
 // pages/store/detail.js
+const { purchaseBattery } = require('../../api/store')
+
+function formatMoney(value) {
+  const number = Number(value || 0)
+  return Number.isFinite(number) ? number.toFixed(2).replace(/\.00$/, '') : '0'
+}
+
 Page({
-
-  /**
-   * 页面的初始数据
-   */
   data: {
-
+    battery: null
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
   onLoad(options) {
-
+    const battery = wx.getStorageSync('storeBatteryDetail') || null
+    if (!battery || (options.id && String(battery.id) !== String(options.id))) {
+      wx.showToast({ title: '商品信息已失效', icon: 'none' })
+      setTimeout(() => wx.navigateBack(), 800)
+      return
+    }
+    this.setData({
+      battery: {
+        ...battery,
+        displayPrice: battery.displayPrice || formatMoney(battery.selling_price || battery.deposit_amount),
+        depositDisplay: battery.depositDisplay || formatMoney(battery.deposit_amount)
+      }
+    })
+    wx.setNavigationBarTitle({ title: '商品详情' })
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
+  goBack() {
+    wx.navigateBack()
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
+  buyNow() {
+    const battery = this.data.battery
+    if (!battery) return
 
-  },
+    if (!wx.getStorageSync('token')) {
+      wx.showModal({
+        title: '登录后购买',
+        content: '购买专属电池需要先登录账号。',
+        confirmText: '去登录',
+        success: res => {
+          if (res.confirm) wx.navigateTo({ url: '/pages/profile/login' })
+        }
+      })
+      return
+    }
 
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh() {
-
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
+    wx.showModal({
+      title: '确认购买',
+      content: `${battery.modelName || battery.model}\n应付 ¥${battery.displayPrice}`,
+      confirmText: '立即购买',
+      success: res => {
+        if (!res.confirm) return
+        wx.showLoading({ title: '提交订单...' })
+        purchaseBattery(battery.id).then(() => {
+          wx.hideLoading()
+          wx.showToast({ title: '购买成功', icon: 'success' })
+          setTimeout(() => wx.navigateBack(), 900)
+        }).catch(err => {
+          wx.hideLoading()
+          const msg = (err && (err.message || err.msg)) || '购买失败'
+          wx.showToast({ title: msg, icon: 'none' })
+        })
+      }
+    })
   }
 })

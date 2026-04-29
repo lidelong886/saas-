@@ -1,5 +1,5 @@
 // pages/map/map.js
-const { getNearbyStations } = require('../../api/station')
+const { getNearbyStations, getStations } = require('../../api/station')
 
 function toNum(v) {
   const n = Number(v)
@@ -8,8 +8,8 @@ function toNum(v) {
 
 Page({
   data: {
-    latitude: 39.9042,
-    longitude: 116.4074,
+    latitude: 38.0428,
+    longitude: 114.5149,
     markers: [],
     stations: [],
     selectedStation: null,
@@ -17,7 +17,7 @@ Page({
     userLocation: null,
     scale: 14,
     isLoading: false,
-    searchRadius: 3000,
+    searchRadius: 15000,
     locationEnabled: false,
     searchKeyword: '',
     showPrivacyAuthorization: false
@@ -82,7 +82,7 @@ Page({
             return
           }
         }
-        // 已有坐标则直接刷新；首次进入且未授权时不发请求（坐标为默认值北京）
+        // 已有坐标则直接刷新；首次进入且未授权时不发请求（坐标为默认值石家庄）
         if (this.data.userLocation) {
           this.loadNearbyStations()
         }
@@ -323,26 +323,26 @@ Page({
     this.setData({ isLoading: true })
     wx.showLoading({ title: '加载站点…', mask: false })
 
-    const { latitude, longitude, searchRadius } = this.data
+    const { latitude, longitude, searchRadius, userLocation } = this.data
     const lat = toNum(latitude)
     const lng = toNum(longitude)
-    if (Number.isNaN(lat) || Number.isNaN(lng)) {
-      wx.hideLoading()
-      this.setData({ isLoading: false })
-      return
-    }
+    const hasRealLocation = !!userLocation && !Number.isNaN(lat) && !Number.isNaN(lng)
+    const requestTask = hasRealLocation
+      ? getNearbyStations({
+        latitude: lat,
+        longitude: lng,
+        radius: Math.max(1, Math.ceil(searchRadius / 1000)),
+        limit: 50
+      })
+      : getStations({ limit: 50 })
 
-    getNearbyStations({
-      latitude: lat,
-      longitude: lng,
-      radius: Math.max(1, Math.ceil(searchRadius / 1000)),
-      limit: 50
-    })
+    requestTask
       .then((res) => {
         const payload = res.data || {}
         const stations = payload.stations || []
         this.setData({
           stations,
+          smartRecommend: stations[0] || null,
           markers: this.createMarkers(stations),
           isLoading: false
         })

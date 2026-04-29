@@ -70,7 +70,7 @@
           <view class="station-meta">
             <text class="meta-tag available">🟢 {{item.available_batteries || 0}} 台可租</text>
             <text class="meta-tag charging" wx:if="{{item.charging_batteries}}">⚡ {{item.charging_batteries}} 充电中</text>
-            <text class="meta-tag distance" wx:if="{{item.distance}}">{{item.distance}}m</text>
+            <text class="meta-tag distance" wx:if="{{item.distance_text}}">{{item.distance_text}}</text>
           </view>
         </view>
         <view class="station-arrow">›</view>
@@ -109,7 +109,7 @@
           <text class="recommend-name">{{recommendedStation.name}}</text>
           <view class="recommend-meta">
             <text class="meta-tag available">可用 {{recommendedStation.available_batteries}} 台</text>
-            <text class="meta-tag distance" wx:if="{{recommendedStation.distance}}">{{recommendedStation.distance}}m</text>
+            <text class="meta-tag distance" wx:if="{{recommendedStation.distance_text}}">{{recommendedStation.distance_text}}</text>
           </view>
         </view>
         <text class="recommend-go">前往</text>
@@ -164,7 +164,7 @@
           <view class="station-meta">
             <text class="meta-tag available">🟢 {{item.available_batteries || 0}} 台可换</text>
             <text class="meta-tag charging" wx:if="{{item.charging_batteries}}">⚡ {{item.charging_batteries}} 充电中</text>
-            <text class="meta-tag distance" wx:if="{{item.distance}}">{{item.distance}}m</text>
+            <text class="meta-tag distance" wx:if="{{item.distance_text}}">{{item.distance_text}}</text>
           </view>
         </view>
         <view class="station-arrow">›</view>

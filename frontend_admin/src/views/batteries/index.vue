@@ -66,6 +66,7 @@
           <el-select v-model="searchForm.status" placeholder="选择状态" clearable class="modern-select">
             <el-option label="可用" value="available" />
             <el-option label="租用中" value="rented" />
+            <el-option label="充电中" value="charging" />
             <el-option label="维护中" value="maintenance" />
             <el-option label="报废" value="scrapped" />
           </el-select>
@@ -197,6 +198,7 @@
           <el-select v-model="formData.status" placeholder="请选择状态" style="width:100%">
             <el-option label="可用" value="available" />
             <el-option label="租用中" value="rented" />
+            <el-option label="充电中" value="charging" />
             <el-option label="维护中" value="maintenance" />
             <el-option label="报废" value="scrapped" />
           </el-select>
@@ -271,6 +273,7 @@ export default {
       searchForm: {
         battery_code: '',
         status: '',
+        voltage_type: '',
         station_id: ''
       },
       formData: {
@@ -278,6 +281,7 @@ export default {
         battery_code: '',
         model: '',
         capacity: 10000,
+        voltage_type: '60V',
         power_level: 100,
         status: 'available',
         voltage: 0,
@@ -302,6 +306,7 @@ export default {
       statusSummary: {
         available: 0,
         rented: 0,
+        charging: 0,
         maintenance: 0,
         scrapped: 0
       }
@@ -341,6 +346,7 @@ export default {
         }
         if (this.searchForm.battery_code) params.keyword = this.searchForm.battery_code
         if (this.searchForm.status) params.status = this.searchForm.status
+        if (this.searchForm.voltage_type) params.voltage_type = this.searchForm.voltage_type
         if (this.searchForm.station_id) params.station_id = this.searchForm.station_id
 
         const response = await getBatteryList(params)
@@ -351,7 +357,7 @@ export default {
             const key = item.status || 'unknown'
             if (acc[key] !== undefined) acc[key] += 1
             return acc
-          }, { available: 0, rented: 0, maintenance: 0, scrapped: 0 })
+          }, { available: 0, rented: 0, charging: 0, maintenance: 0, scrapped: 0 })
         }
       } catch (error) {
         ElMessage.error('加载电池列表失败')
@@ -361,7 +367,7 @@ export default {
     },
     handleSearch() { this.pagination.page = 1; this.loadBatteries() },
     handleReset() {
-      this.searchForm = { battery_code: '', status: '', station_id: '' }
+      this.searchForm = { battery_code: '', status: '', voltage_type: '', station_id: '' }
       this.pagination.page = 1
       this.loadBatteries()
     },
@@ -369,8 +375,8 @@ export default {
       this.isEdit = false
       this.formData = {
         tenant_id: this.tenantList[0]?.id || 1,
-        battery_code: '', model: '', capacity: 10000, power_level: 100,
-        status: 'available', voltage: 0, temperature: 0,
+        battery_code: '', model: '', capacity: 20000, voltage_type: '60V', power_level: 100,
+        status: 'available', voltage: 60.8, temperature: 30.5,
         rental_price_per_hour: 0.50, deposit_amount: 50.00, selling_price: null,
         current_station_id: null
       }
@@ -392,6 +398,9 @@ export default {
       } else {
         this.formData.deposit_amount = parseFloat(this.formData.deposit_amount)
       }
+      if (!this.formData.voltage_type) {
+        this.formData.voltage_type = this.formData.model && this.formData.model.includes('72V') ? '72V' : '60V'
+      }
       if (this.formData.selling_price === undefined || this.formData.selling_price === null) {
         this.formData.selling_price = null
       } else {
@@ -399,15 +408,33 @@ export default {
       }
       this.dialogVisible = true
     },
+    buildSubmitPayload() {
+      return {
+        tenant_id: this.formData.tenant_id,
+        battery_code: this.formData.battery_code,
+        model: this.formData.model,
+        capacity: Number(this.formData.capacity),
+        voltage_type: this.formData.voltage_type || '60V',
+        power_level: Number(this.formData.power_level),
+        status: this.formData.status,
+        voltage: this.formData.voltage === '' || this.formData.voltage === null ? null : Number(this.formData.voltage),
+        temperature: this.formData.temperature === '' || this.formData.temperature === null ? null : Number(this.formData.temperature),
+        rental_price_per_hour: Number(this.formData.rental_price_per_hour || 0),
+        deposit_amount: Number(this.formData.deposit_amount || 0),
+        selling_price: this.formData.selling_price === '' || this.formData.selling_price === null || this.formData.selling_price === undefined ? null : Number(this.formData.selling_price),
+        current_station_id: this.formData.current_station_id || null
+      }
+    },
     async handleSubmit() {
       try {
         await this.$refs.formRef.validate()
         this.submitting = true
+        const payload = this.buildSubmitPayload()
         if (this.isEdit) {
-          await updateBattery(this.formData.id, this.formData)
+          await updateBattery(this.formData.id, payload)
           ElMessage.success('编辑成功')
         } else {
-          await createBattery(this.formData)
+          await createBattery(payload)
           ElMessage.success('创建成功')
         }
         this.dialogVisible = false
@@ -423,7 +450,7 @@ export default {
         }).catch(() => {})
     },
     getStatusLabel(status) {
-      return { available: '可用', rented: '租用中', maintenance: '维护中', scrapped: '报废' }[status] || status
+      return { available: '可用', rented: '租用中', charging: '充电中', maintenance: '维护中', scrapped: '报废' }[status] || status
     },
     getPowerStatus(powerLevel) {
       const v = Number(powerLevel) || 0
@@ -664,6 +691,7 @@ export default {
   display: inline-block;
   &.available { background: #d1fae5; color: #059669; }
   &.rented    { background: #fed7aa; color: #F97316; }
+  &.charging  { background: #dbeafe; color: #2563eb; }
   &.maintenance { background: #fee2e2; color: #dc2626; }
   &.scrapped  { background: #f1f5f9; color: #64748b; }
 }

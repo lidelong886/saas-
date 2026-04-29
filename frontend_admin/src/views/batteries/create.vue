@@ -69,10 +69,12 @@ export default {
         tenant_id: 1,
         model: '',
         capacity: 10000,
+        voltage_type: '60V',
         battery_type: 'lithium_ion',
         current_station_id: null,
         rental_price_per_hour: 0.5,
-        deposit_amount: 50
+        deposit_amount: 50,
+        selling_price: null
       },
       rules: {
         model: [{ required: true, message: '请输入电池型号', trigger: 'blur' }],

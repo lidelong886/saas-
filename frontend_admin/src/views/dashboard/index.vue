@@ -29,7 +29,7 @@
             </div>
             <span class="stat-trend up">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 5 5M7 7l5 5 5-5"/></svg>
-              +12%
+              实时
             </span>
           </div>
           <div class="stat-value">{{ stats.batteries?.total || 0 }}</div>
@@ -54,7 +54,7 @@
             </div>
             <span class="stat-trend up">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 5 5M7 7l5 5 5-5"/></svg>
-              +5%
+              实时
             </span>
           </div>
           <div class="stat-value">{{ stats.stations?.total || 0 }}</div>
@@ -79,7 +79,7 @@
             </div>
             <span class="stat-trend up">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 5 5M7 7l5 5 5-5"/></svg>
-              +23%
+              实时
             </span>
           </div>
           <div class="stat-value">{{ stats.orders?.total || 0 }}</div>
@@ -103,7 +103,7 @@
             </div>
             <span class="stat-trend up">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17l5-5 5 5M7 7l5 5 5-5"/></svg>
-              +8%
+              实时
             </span>
           </div>
           <div class="stat-value">{{ stats.users?.total || 0 }}</div>
@@ -177,7 +177,16 @@ export default {
   name: 'Dashboard',
   data() {
     return {
-      stats: {},
+      stats: {
+        batteries: { total: 0, available: 0, rented: 0, maintenance: 0, offline: 0 },
+        stations: { total: 0, active: 0 },
+        orders: { total: 0, today: 0 },
+        users: { total: 0, today_new: 0 },
+        revenue: { today: 0, month: 0 },
+        revenue_trend: [],
+        order_trend: [],
+        station_usage: []
+      },
       charts: {
         revenue: null,
         battery: null,
@@ -213,37 +222,60 @@ export default {
     Object.values(this.charts).forEach(chart => chart?.dispose())
   },
   methods: {
+    getEmptyStats() {
+      return {
+        batteries: { total: 0, available: 0, rented: 0, maintenance: 0, offline: 0 },
+        stations: { total: 0, active: 0 },
+        orders: { total: 0, today: 0 },
+        users: { total: 0, today_new: 0 },
+        revenue: { today: 0, month: 0 },
+        revenue_trend: [],
+        order_trend: [],
+        station_usage: []
+      }
+    },
+    normalizeDashboardStats(data = {}) {
+      const batteryStats = data.battery_stats || {}
+      const stationStats = data.station_stats || {}
+      const userStats = data.user_stats || {}
+      return {
+        batteries: {
+          total: batteryStats.total_batteries || data.batteries?.total || 0,
+          available: batteryStats.available_batteries || data.batteries?.available || 0,
+          rented: batteryStats.rented_batteries || data.batteries?.rented || 0,
+          maintenance: batteryStats.maintenance_batteries || data.batteries?.maintenance || 0,
+          offline: batteryStats.offline_batteries || data.batteries?.offline || 0
+        },
+        stations: {
+          total: stationStats.total_stations || data.stations?.total || 0,
+          active: stationStats.active_stations || data.stations?.active || 0
+        },
+        orders: {
+          total: data.total_orders || data.orders?.total || 0,
+          today: data.today_orders || data.orders?.today || 0
+        },
+        users: {
+          total: userStats.total_users || data.users?.total || 0,
+          today_new: userStats.new_users || data.users?.today_new || 0
+        },
+        revenue: {
+          today: data.today_revenue || data.revenue?.today || 0,
+          month: data.month_revenue || data.revenue?.month || 0
+        },
+        revenue_trend: Array.isArray(data.revenue_trend) ? data.revenue_trend : [],
+        order_trend: Array.isArray(data.order_trend) ? data.order_trend : [],
+        station_usage: Array.isArray(data.station_usage) ? data.station_usage : []
+      }
+    },
     async loadStats() {
       try {
         const res = await getDashboardStats()
-        if (res.code === 200 && res.data) {
-          const data = res.data
-          this.stats = {
-            batteries: {
-              total: data.battery_stats?.total_batteries || 0,
-              available: data.battery_stats?.available_batteries || 0,
-              rented: data.battery_stats?.rented_batteries || 0,
-              maintenance: data.battery_stats?.maintenance_batteries || 0,
-              offline: 0
-            },
-            stations: { total: 8, active: 7 },
-            orders: { total: 143, today: data.today_orders || 0 },
-            users: { total: data.user_stats?.total_users || 0, today_new: data.user_stats?.new_users || 0 },
-            revenue: { today: data.today_revenue || 0, month: 12480.00 },
-            revenue_trend: data.revenue_trend || [],
-            order_trend: data.order_trend || []
-          }
+        if ((res.code === 200 || res.code === 0) && res.data) {
+          this.stats = this.normalizeDashboardStats(res.data)
         }
       } catch (e) {
-        this.stats = {
-          batteries: { total: 26, available: 18, rented: 5, maintenance: 2, offline: 1 },
-          stations: { total: 8, active: 7 },
-          orders: { total: 143, today: 12 },
-          users: { total: 58, today_new: 3 },
-          revenue: { today: 328.50, month: 12480.00 },
-          revenue_trend: [],
-          order_trend: []
-        }
+        console.error('加载仪表盘真实数据失败:', e)
+        this.stats = this.getEmptyStats()
       }
       this.$nextTick(() => {
         this.updateCharts()
@@ -284,7 +316,7 @@ export default {
           axisLabel: { color: '#94a3b8', fontSize: 11 }
         },
         series: [{
-          data: revenueTrend.length ? revenueTrend : [280, 320, 410, 380, 450, 520, 328],
+          data: revenueTrend,
           type: 'line',
           smooth: true,
           symbol: 'circle',
@@ -310,10 +342,10 @@ export default {
     },
     updateBatteryChart() {
       const data = [
-        { value: this.stats.batteries?.available || 18, name: '可用', itemStyle: { color: '#10b981' } },
-        { value: this.stats.batteries?.rented || 5, name: '使用中', itemStyle: { color: '#F97316' } },
-        { value: this.stats.batteries?.maintenance || 2, name: '维护中', itemStyle: { color: '#ef4444' } },
-        { value: this.stats.batteries?.offline || 1, name: '离线', itemStyle: { color: '#94a3b8' } }
+        { value: this.stats.batteries?.available || 0, name: '可用', itemStyle: { color: '#10b981' } },
+        { value: this.stats.batteries?.rented || 0, name: '使用中', itemStyle: { color: '#F97316' } },
+        { value: this.stats.batteries?.maintenance || 0, name: '维护中', itemStyle: { color: '#ef4444' } },
+        { value: this.stats.batteries?.offline || 0, name: '离线', itemStyle: { color: '#94a3b8' } }
       ]
       const option = {
         tooltip: {
@@ -354,7 +386,7 @@ export default {
         grid: { left: 50, right: 20, top: 20, bottom: 30 },
         xAxis: {
           type: 'category',
-          data: orderTrend.length ? Array.from({ length: 30 }, (_, i) => i + 1) : Array.from({ length: 30 }, (_, i) => i + 1),
+          data: Array.from({ length: orderTrend.length || 30 }, (_, i) => i + 1),
           axisLine: { lineStyle: { color: '#e2e8f0' } },
           axisLabel: { color: '#94a3b8', fontSize: 11, interval: 4 }
         },
@@ -366,7 +398,7 @@ export default {
           axisLabel: { color: '#94a3b8', fontSize: 11 }
         },
         series: [{
-          data: orderTrend.length ? orderTrend : Array.from({ length: 30 }, () => Math.floor(Math.random() * 20) + 5),
+          data: orderTrend,
           type: 'bar',
           barWidth: '60%',
           itemStyle: {
@@ -397,12 +429,12 @@ export default {
         },
         yAxis: {
           type: 'category',
-          data: ['站点A', '站点B', '站点C', '站点D', '站点E'],
+          data: (this.stats.station_usage || []).map(item => item.name),
           axisLine: { lineStyle: { color: '#e2e8f0' } },
           axisLabel: { color: '#64748b', fontSize: 12 }
         },
         series: [{
-          data: [85, 72, 68, 55, 42],
+          data: (this.stats.station_usage || []).map(item => item.usage_rate),
           type: 'bar',
           barWidth: 16,
           itemStyle: {

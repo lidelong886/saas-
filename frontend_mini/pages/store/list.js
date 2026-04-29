@@ -1,78 +1,227 @@
 // pages/store/list.js
 const { getStoreBatteries, purchaseBattery } = require('../../api/store')
 
+function toNumber(value, fallback = 0) {
+  const number = Number(value)
+  return Number.isFinite(number) ? number : fallback
+}
+
+function formatMoney(value) {
+  const number = toNumber(value, 0)
+  return number.toFixed(2).replace(/\.00$/, '')
+}
+
+function inferVoltage(item) {
+  if (item.voltage_type) return item.voltage_type
+  const model = item.model || ''
+  const match = model.match(/(48|60|72)V/i)
+  return match ? `${match[1]}V` : '60V'
+}
+
+function normalizeBattery(item, index) {
+  const capacity = toNumber(item.capacity, 0)
+  const powerLevel = Math.max(0, Math.min(100, toNumber(item.power_level, 0)))
+  const price = item.selling_price || item.deposit_amount || 0
+  const voltage = inferVoltage(item)
+  const sellingPoint = powerLevel >= 90 ? '满电交付' : powerLevel >= 70 ? '高电量现货' : '门店检测交付'
+
+  return {
+    ...item,
+    voltageType: voltage,
+    priceValue: toNumber(price, 0),
+    displayPrice: formatMoney(price),
+    depositDisplay: formatMoney(item.deposit_amount || 0),
+    capacityDisplay: capacity >= 1000 ? `${Math.round(capacity / 1000)}Ah` : `${capacity}mAh`,
+    powerLevel,
+    modelName: item.model || '智能锂电池',
+    batteryCode: item.battery_code || `PN-${index + 1}`,
+    stationName: item.current_station_name || item.station_name || '官方认证站点',
+    sellingPoint,
+    warrantyText: '24个月质保',
+    serviceText: '同城售后',
+    isFeatured: index === 0
+  }
+}
+
 Page({
   data: {
     batteries: [],
+    filteredBatteries: [],
     page: 1,
     hasMore: true,
-    isLoading: false
+    isLoading: false,
+    keyword: '',
+    activeVoltage: 'all',
+    activePrice: 'all',
+    sortMode: 'recommend',
+    voltageTabs: [
+      { key: 'all', label: '??' },
+      { key: '60V', label: '60V' },
+      { key: '72V', label: '72V' }
+    ],
+    priceTabs: [
+      { key: 'all', label: '??' },
+      { key: '0-1000', label: '1000??', min: 0, max: 1000 },
+      { key: '1000-2000', label: '1000-2000', min: 1000, max: 2000 },
+      { key: '2000+', label: '2000??', min: 2000 }
+    ],
+    sortTabs: [
+      { key: 'recommend', label: '??' },
+      { key: 'priceAsc', label: '价格升序' },
+      { key: 'priceDesc', label: '价格降序' },
+      { key: 'powerDesc', label: '电量优先' }
+    ]
   },
 
-  onLoad: function() {
-    this.loadBatteries()
+  onLoad() {
+    wx.setNavigationBarTitle({ title: '电池商城' })
+    this.loadBatteries(true)
   },
 
-  loadBatteries: function() {
-    if (this.data.isLoading || !this.data.hasMore) return
+  normalizeList(list) {
+    return (list || []).map((item, index) => normalizeBattery(item, index))
+  },
 
+  getListFromResponse(res) {
+    const data = res.data || {}
+    if (Array.isArray(data)) return data
+    return data.list || data.items || data.records || []
+  },
+
+  getHasMore(res, list) {
+    const data = res.data || {}
+    const pagination = data.pagination || data
+    if (pagination.pages && pagination.page) return pagination.page < pagination.pages
+    if (typeof pagination.total === 'number' && pagination.per_page) {
+      return this.data.page * pagination.per_page < pagination.total
+    }
+    return list.length >= 20
+  },
+
+  getActivePriceRange() {
+    const priceTabs = Array.isArray(this.data.priceTabs) ? this.data.priceTabs : []
+    return priceTabs.find(item => item.key === this.data.activePrice) || priceTabs[0] || { key: 'all' }
+  },
+
+  buildStoreParams(page) {
+    const range = this.getActivePriceRange()
+    const params = { page, per_page: 20, sort: this.data.sortMode }
+    if (this.data.activeVoltage !== 'all') params.voltage_type = this.data.activeVoltage
+    if (range.min != null) params.price_min = range.min
+    if (range.max != null) params.price_max = range.max
+    return params
+  },
+
+  loadBatteries(refresh = false) {
+    if (this.data.isLoading) return
+    if (!refresh && !this.data.hasMore) return
+
+    const page = refresh ? 1 : this.data.page
     this.setData({ isLoading: true })
-    wx.showLoading({ title: '加载中...' })
+    if (refresh) wx.showLoading({ title: '加载商城...' })
 
-    getStoreBatteries({
-      page: this.data.page,
-      per_page: 20
-    }).then(res => {
-      const data = res.data || {}
-      const list = data.list || data.items || []
-
+    getStoreBatteries(this.buildStoreParams(page)).then(res => {
+      const list = this.normalizeList(this.getListFromResponse(res))
+      const batteries = refresh ? list : this.data.batteries.concat(list)
       this.setData({
-        batteries: this.data.page === 1 ? list : [...this.data.batteries, ...list],
-        hasMore: list.length >= 20,
-        page: this.data.page + 1,
+        batteries,
+        page: page + 1,
+        hasMore: this.getHasMore(res, list),
         isLoading: false
       })
-      wx.hideLoading()
-    }).catch(err => {
-      wx.hideLoading()
-      wx.showToast({ title: '加载失败', icon: 'none' })
+      this.applyFilters()
+    }).catch(() => {
       this.setData({ isLoading: false })
+      wx.showToast({ title: '商城加载失败', icon: 'none' })
+    }).finally(() => {
+      wx.hideLoading()
+      wx.stopPullDownRefresh()
     })
   },
 
-  onBatteryTap: function(e) {
-    const battery = e.currentTarget.dataset.battery
-    wx.showModal({
-      title: battery.model,
-      content: `电池编号: ${battery.battery_code}\n容量: ${battery.capacity}mAh\n电量: ${battery.power_level}%\n售价: ¥${battery.selling_price || battery.deposit_amount}`,
-      showCancel: false
+  applyFilters() {
+    const keyword = (this.data.keyword || '').trim().toLowerCase()
+    const range = this.getActivePriceRange()
+    let list = this.data.batteries.filter(item => {
+      const matchVoltage = this.data.activeVoltage === 'all' || item.voltageType === this.data.activeVoltage
+      const matchPriceMin = range.min == null || item.priceValue >= range.min
+      const matchPriceMax = range.max == null || item.priceValue < range.max
+      const text = `${item.modelName} ${item.batteryCode} ${item.stationName}`.toLowerCase()
+      return matchVoltage && matchPriceMin && matchPriceMax && (!keyword || text.includes(keyword))
     })
+
+    if (this.data.sortMode === 'priceAsc') {
+      list = list.slice().sort((a, b) => a.priceValue - b.priceValue)
+    } else if (this.data.sortMode === 'priceDesc') {
+      list = list.slice().sort((a, b) => b.priceValue - a.priceValue)
+    } else if (this.data.sortMode === 'powerDesc') {
+      list = list.slice().sort((a, b) => b.powerLevel - a.powerLevel)
+    }
+
+    this.setData({ filteredBatteries: list })
   },
 
-  onPurchaseTap: function(e) {
+  onSearchInput(e) {
+    this.setData({ keyword: e.detail.value || '' })
+    this.applyFilters()
+  },
+
+  clearSearch() {
+    this.setData({ keyword: '' })
+    this.applyFilters()
+  },
+
+  switchVoltage(e) {
+    this.setData({ activeVoltage: e.currentTarget.dataset.key, page: 1, hasMore: true, batteries: [] })
+    this.loadBatteries(true)
+  },
+
+  switchPrice(e) {
+    this.setData({ activePrice: e.currentTarget.dataset.key, page: 1, hasMore: true, batteries: [] })
+    this.loadBatteries(true)
+  },
+
+  switchSort(e) {
+    this.setData({ sortMode: e.currentTarget.dataset.key, page: 1, hasMore: true, batteries: [] })
+    this.loadBatteries(true)
+  },
+
+  onBatteryTap(e) {
     const battery = e.currentTarget.dataset.battery
+    wx.setStorageSync('storeBatteryDetail', battery)
+    wx.navigateTo({ url: `/pages/store/detail?id=${battery.id}` })
+  },
+
+  onPurchaseTap(e) {
+    const battery = e.currentTarget.dataset.battery
+    if (!wx.getStorageSync('token')) {
+      wx.showModal({
+        title: '登录后购买',
+        content: '购买专属电池需要先登录账号。',
+        confirmText: '去登录',
+        success: res => {
+          if (res.confirm) wx.navigateTo({ url: '/pages/profile/login' })
+        }
+      })
+      return
+    }
 
     wx.showModal({
       title: '确认购买',
-      content: `确定购买 ${battery.model} 吗？\n价格：¥${battery.selling_price || battery.deposit_amount}`,
-      success: (res) => {
-        if (res.confirm) {
-          this.purchaseBattery(battery.id)
-        }
+      content: `${battery.modelName}\n${battery.capacityDisplay} · ${battery.voltageType} · ${battery.warrantyText}\n应付 ¥${battery.displayPrice}`,
+      confirmText: '立即购买',
+      success: res => {
+        if (res.confirm) this.purchaseBattery(battery.id)
       }
     })
   },
 
-  purchaseBattery: function(batteryId) {
-    wx.showLoading({ title: '购买中...' })
-
-    purchaseBattery(batteryId).then(res => {
+  purchaseBattery(batteryId) {
+    wx.showLoading({ title: '提交订单...' })
+    purchaseBattery(batteryId).then(() => {
       wx.hideLoading()
       wx.showToast({ title: '购买成功', icon: 'success' })
-      setTimeout(() => {
-        this.setData({ page: 1, hasMore: true })
-        this.loadBatteries()
-      }, 1500)
+      setTimeout(() => this.loadBatteries(true), 900)
     }).catch(err => {
       wx.hideLoading()
       const msg = (err && (err.message || err.msg)) || '购买失败'
@@ -80,13 +229,11 @@ Page({
     })
   },
 
-  onReachBottom: function() {
-    this.loadBatteries()
+  onReachBottom() {
+    this.loadBatteries(false)
   },
 
-  onPullDownRefresh: function() {
-    this.setData({ page: 1, hasMore: true })
-    this.loadBatteries()
-    wx.stopPullDownRefresh()
+  onPullDownRefresh() {
+    this.loadBatteries(true)
   }
 })

@@ -20,7 +20,7 @@
   <view class="recommend-section" wx:if="{{recommendedPackages.length > 0}}">
     <view class="section-header">
       <text class="section-title">✨ 为您推荐</text>
-      <text class="section-subtitle">基于与您相似用户的选择 (协同过滤)</text>
+      <text class="section-subtitle">为新用户优先展示热门上架套餐</text>
     </view>
     <scroll-view class="recommend-scroll" scroll-x>
       <view class="recommend-card" wx:for="{{recommendedPackages}}" wx:key="id">

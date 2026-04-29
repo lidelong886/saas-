@@ -67,7 +67,7 @@ export default {
       pageLoading: true, loading: false,
       tenantList: [],
       stationList: [],
-      form: { battery_code: '', model: '', capacity: 10000, status: 'available', power_level: 100, tenant_id: 1, current_station_id: null },
+      form: { battery_code: '', model: '', capacity: 10000, voltage_type: '60V', status: 'available', power_level: 100, tenant_id: 1, selling_price: null, current_station_id: null },
       rules: { model: [{ required: true, message: '请输入电池型号', trigger: 'blur' }] }
     }
   },
@@ -94,6 +94,8 @@ export default {
       try {
         const res = await getBatteryDetail(this.$route.params.id)
         this.form = res.data
+        if (!this.form.voltage_type) this.form.voltage_type = this.form.model && this.form.model.includes('72V') ? '72V' : '60V'
+        if (this.form.selling_price != null) this.form.selling_price = Number(this.form.selling_price)
         if (this.form.current_station_id === undefined) this.form.current_station_id = null
         this.loadStations()
       } catch (e) { ElMessage.error('加载失败'); this.$router.back() } finally { this.pageLoading = false }

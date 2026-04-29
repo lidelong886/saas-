@@ -248,7 +248,12 @@ class RecommendService:
                     ).order_by(Package.created_at.desc()).limit(limit - len(packages)).all()
                     packages.extend(more_packages)
 
-            return [p.to_dict() for p in packages[:limit]]
+            result = []
+            for package in packages[:limit]:
+                package_data = package.to_dict()
+                package_data['recommend_reason'] = '热门上架套餐'
+                result.append(package_data)
+            return result
 
         except Exception as e:
             print(f"获取热门套餐失败: {str(e)}")

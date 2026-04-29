@@ -1,4 +1,4 @@
-﻿from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from .. import db
@@ -70,7 +70,9 @@ def _admin(username, phone, tenant_id, password, nickname, super_admin=False):
 
 
 def _user(username, phone, tenant_id, password, **kwargs):
-    user = User.query.filter_by(phone=phone, tenant_id=tenant_id, is_deleted=False).first()
+    user = User.query.filter_by(phone=phone, is_deleted=False).first()
+    if not user:
+        user = User.query.filter_by(username=username, is_deleted=False).first()
     if not user:
         user = User(username=username, phone=phone, email=kwargs.get('email', f'{username}@example.com'), tenant_id=tenant_id)
         db.session.add(user)
@@ -97,7 +99,7 @@ def _user(username, phone, tenant_id, password, **kwargs):
 
 
 def _station(code, tenant_id, **kwargs):
-    station = Station.query.filter_by(station_code=code, tenant_id=tenant_id, is_deleted=False).first()
+    station = Station.query.filter_by(station_code=code, is_deleted=False).first()
     if not station:
         station = Station(
             station_code=code,
@@ -136,7 +138,7 @@ def _station(code, tenant_id, **kwargs):
 
 
 def _cabinet(code, tenant_id, station, **kwargs):
-    cabinet = Cabinet.query.filter_by(cabinet_code=code, tenant_id=tenant_id, is_deleted=False).first()
+    cabinet = Cabinet.query.filter_by(cabinet_code=code, is_deleted=False).first()
     if not cabinet:
         cabinet = Cabinet(cabinet_code=code, name=kwargs['name'], station_id=station.id, total_slots=kwargs.get('total_slots', 12), occupied_slots=kwargs.get('occupied_slots', 0), tenant_id=tenant_id)
         db.session.add(cabinet)
@@ -164,7 +166,7 @@ def _cabinet(code, tenant_id, station, **kwargs):
 
 
 def _battery(code, tenant_id, station, cabinet=None, **kwargs):
-    battery = Battery.query.filter_by(battery_code=code, tenant_id=tenant_id, is_deleted=False).first()
+    battery = Battery.query.filter_by(battery_code=code, is_deleted=False).first()
     if not battery:
         battery = Battery(battery_code=code, model=kwargs.get('model', '60V20Ah 标准电池'), capacity=kwargs.get('capacity', 20000), tenant_id=tenant_id)
         db.session.add(battery)
@@ -216,7 +218,7 @@ def _package(name, tenant_id, **kwargs):
 
 
 def _order(order_no, tenant_id, user, **kwargs):
-    order = Order.query.filter_by(order_no=order_no, tenant_id=tenant_id, is_deleted=False).first()
+    order = Order.query.filter_by(order_no=order_no, is_deleted=False).first()
     if not order:
         order = Order(order_no=order_no, order_type=kwargs.get('order_type', 'rental'), user_id=user.id, tenant_id=tenant_id)
         db.session.add(order)
@@ -258,7 +260,7 @@ def _order(order_no, tenant_id, user, **kwargs):
 
 
 def _payment(payment_no, tenant_id, user, order=None, **kwargs):
-    payment = Payment.query.filter_by(payment_no=payment_no, tenant_id=tenant_id, is_deleted=False).first()
+    payment = Payment.query.filter_by(payment_no=payment_no, is_deleted=False).first()
     if not payment:
         payment = Payment(payment_no=payment_no, user_id=user.id, amount=kwargs.get('amount', Decimal('0.00')), tenant_id=tenant_id)
         db.session.add(payment)
@@ -324,6 +326,8 @@ def ensure_demo_data(app=None):
         contact_email='fastpower@example.com',
         remarks='多租户切换演示运营商',
     )
+
+    default_tenant = db.session.get(Tenant, 1) or default_tenant
 
     _admin('admin', '18888888888', default_tenant.id, 'admin123', '系统管理员', True)
     _admin('tenant_admin', '18888880001', fast_tenant.id, 'tenant123', '闪电换电管理员', True)
@@ -446,8 +450,12 @@ def ensure_demo_data(app=None):
     new_battery = _battery('BAT001000005', default_tenant.id, station_sub, cabinet_sub, slot_position='04', power_level=99, status='available', total_usage_hours=45, cycle_count=18)
     _battery('BAT001000006', default_tenant.id, station_main, cabinet_main_b, slot_position='05', power_level=88, status='available')
     _battery('BAT001000007', default_tenant.id, station_sub, cabinet_sub, slot_position='06', power_level=67, status='available')
+    _battery('BAT001720001', default_tenant.id, station_main, cabinet_main_b, slot_position='07', model='72V32Ah 长续航旗舰电池', capacity=32000, voltage_type='72V', voltage='73.6', power_level=97, status='available', selling_price='1699.00', deposit_amount='120.00', rental_price_per_hour='0.80', total_usage_hours=38, cycle_count=12)
+    _battery('BAT001720002', default_tenant.id, station_sub, cabinet_sub, slot_position='07', model='72V38Ah 城配高能电池', capacity=38000, voltage_type='72V', voltage='74.1', power_level=92, status='available', selling_price='2199.00', deposit_amount='150.00', rental_price_per_hour='0.90', total_usage_hours=66, cycle_count=24)
+    _battery('BAT001720003', default_tenant.id, station_main, cabinet_main_a, slot_position='08', model='72V45Ah ?? Pro ??', capacity=45000, voltage_type='72V', voltage='73.8', power_level=86, status='available', selling_price='2799.00', deposit_amount='180.00', rental_price_per_hour='1.00', total_usage_hours=92, cycle_count=31)
     fast_battery = _battery('BAT002000001', fast_tenant.id, fast_station, fast_cabinet, slot_position='01', power_level=91, status='available')
     _battery('BAT002000002', fast_tenant.id, fast_station, fast_cabinet, slot_position='02', power_level=62, status='charging')
+    _battery('BAT002720001', fast_tenant.id, fast_station, fast_cabinet, slot_position='03', model='72V35Ah 闪电极速版电池', capacity=35000, voltage_type='72V', voltage='73.9', power_level=95, status='available', selling_price='1999.00', deposit_amount='150.00', rental_price_per_hour='0.88')
     _commit_flush()
 
     month_package = _package(
@@ -597,7 +605,7 @@ def ensure_demo_data(app=None):
         )
         db.session.add(user_package)
 
-    if not ExchangeRecord.query.filter_by(record_no='EXC-DEMO-001', tenant_id=default_tenant.id, is_deleted=False).first():
+    if not ExchangeRecord.query.filter_by(record_no='EXC-DEMO-001', is_deleted=False).first():
         exchange = ExchangeRecord(
             record_no='EXC-DEMO-001',
             user_id=demo_user.id,
@@ -631,7 +639,7 @@ def ensure_demo_data(app=None):
         if not exists:
             db.session.add(Notification(user_id=user.id, noti_type=noti_type, title=title, content=content, link_type=link_type, link_id=str(link_id) if link_id else None, is_read=is_read, tenant_id=tenant_id))
 
-    if not FaultReport.query.filter_by(report_no='FLT-DEMO-001', tenant_id=default_tenant.id, is_deleted=False).first():
+    if not FaultReport.query.filter_by(report_no='FLT-DEMO-001', is_deleted=False).first():
         fault = FaultReport(
             report_no='FLT-DEMO-001',
             user_id=demo_user.id,

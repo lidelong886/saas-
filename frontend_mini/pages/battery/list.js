@@ -88,8 +88,8 @@ Page({
     request.post(`/battery/${battery.id}/return`, {
       station_id: 1,
       cabinet_id: 1,
-      latitude: 39.9042,
-      longitude: 116.4074
+      latitude: 38.0428,
+      longitude: 114.5149
     }).then(res => {
       wx.hideLoading()
       wx.showModal({
@@ -108,8 +108,7 @@ Page({
   },
 
   goToBuyBattery() {
-    // 后续可以实现电池商城页面，目前先跳转到套餐页（占位）
-    wx.navigateTo({ url: '/pages/package/list' })
+    wx.navigateTo({ url: '/pages/store/list' })
   },
 
   onTap(e) {

@@ -9,6 +9,18 @@ Page({
     loading: false
   },
 
+  onLoad() {
+    this.useDefaultTenant()
+  },
+
+  useDefaultTenant() {
+    const app = getApp()
+    if (app && app.globalData) {
+      app.globalData.tenantId = 1
+    }
+    wx.setStorageSync('selectedTenantId', 1)
+  },
+
   onPhoneInput(e) {
     this.setData({ phone: e.detail.value || '' })
   },
@@ -55,6 +67,7 @@ Page({
 
     this.setData({ loading: true })
     try {
+      this.useDefaultTenant()
       const res = await register({ 
         username, 
         password,

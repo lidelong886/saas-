@@ -50,18 +50,25 @@ def get_available_batteries():
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 20, type=int)
 
-        filters = {'status': 'available'}
+        query = Battery.query.filter(
+            Battery.tenant_id == g.tenant_id,
+            Battery.is_deleted == False,
+            Battery.status == 'available',
+            Battery.current_user_id == None,
+            Battery.owner_id == None,
+            Battery.power_level >= 20
+        )
         if station_id:
-            filters['current_station_id'] = station_id
+            query = query.filter(Battery.current_station_id == station_id)
 
-        pagination = Battery.get_list(
+        pagination = query.order_by(Battery.power_level.desc(), Battery.id.asc()).paginate(
             page=page,
             per_page=per_page,
-            filters=filters
+            error_out=False
         )
 
         return paginate_response(
-            [battery.to_dict() for battery in pagination['items']],
+            [battery.to_dict() for battery in pagination.items],
             pagination,
             '获取可用电池列表成功'
         )

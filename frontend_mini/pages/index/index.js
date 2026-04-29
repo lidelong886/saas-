@@ -1,8 +1,8 @@
 // pages/index/index.js
-const { getNearbyStations } = require('../../api/station')
+const { getNearbyStations, getStations } = require('../../api/station')
 const { getUserStats, getUserBalance } = require('../../api/user')
 const { getBatteryInsight } = require('../../utils/batteryInsight')
-const { formatDistance } = require('../../utils/util')
+const { formatDistanceKm } = require('../../utils/util')
 const { pickRecommendedStation, getRecommendationReason } = require('../../utils/stationRecommendation')
 const { getPackageRecommendations } = require('../../api/recommend')
 const { getUserPreferences } = require('../../api/rider')
@@ -23,6 +23,7 @@ Page({
     alertBannerText: '',
     latitude: null,
     longitude: null,
+    hasRealLocation: false,
     recommendedPackages: [],
     userBalance: 0,
     userBalanceText: '0.00',
@@ -99,15 +100,16 @@ Page({
       success: (res) => {
         this.setData({
           latitude: res.latitude,
-          longitude: res.longitude
+          longitude: res.longitude,
+          hasRealLocation: true
         })
         this.loadData()
       },
       fail: () => {
-        // 默认北京坐标，以便展示内容
         this.setData({
-          latitude: 39.9042,
-          longitude: 116.4074
+          latitude: null,
+          longitude: null,
+          hasRealLocation: false
         })
         this.loadData()
       }
@@ -147,14 +149,12 @@ Page({
   },
 
   loadNearbyStations: function() {
-    const { latitude, longitude } = this.data
+    const { latitude, longitude, hasRealLocation } = this.data
+    const requestTask = hasRealLocation && latitude != null && longitude != null
+      ? getNearbyStations({ latitude, longitude, radius: 5, limit: 3 })
+      : getStations({ limit: 3 })
 
-    getNearbyStations({
-      latitude,
-      longitude,
-      radius: 5,
-      limit: 3
-    }).then(res => {
+    requestTask.then(res => {
       const payload = res.data || {}
       const list = (payload.stations || []).map(station => this.enhanceStation(station))
       const recommendedStation = this.enhanceStation(pickRecommendedStation(list, this.data.batteryInsight))
@@ -225,13 +225,13 @@ Page({
     if (!station) return null
     const next = { ...station }
     next.availableBatteryCount = Number(next.available_batteries) || 0
-    next.distanceText = next.distance == null ? '-' : formatDistance(next.distance)
+    next.distanceText = next.distance_text || (next.distance == null ? '' : formatDistanceKm(next.distance))
     return next
   },
 
   getRecommendedDistanceText(station) {
-    if (!station || station.distance == null) return '-'
-    return formatDistance(station.distance)
+    if (!station) return ''
+    return station.distance_text || (station.distance == null ? '' : formatDistanceKm(station.distance))
   },
 
   getAlertIconText(batteryInsight) {

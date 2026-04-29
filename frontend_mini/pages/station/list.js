@@ -1,5 +1,5 @@
 // pages/station/list.js
-const { getNearbyStations } = require('../../api/station')
+const { getNearbyStations, getStations } = require('../../api/station')
 
 Page({
   data: {
@@ -11,6 +11,7 @@ Page({
     pageSize: 20,
     latitude: null,
     longitude: null,
+    hasRealLocation: false,
     searchKeyword: '', // 搜索关键词
     sortBy: 'distance', // 排序方式: distance, available, name
     filterStatus: 'all', // 筛选状态: all, active, maintenance
@@ -44,22 +45,22 @@ Page({
       success: (res) => {
         this.setData({
           latitude: res.latitude,
-          longitude: res.longitude
+          longitude: res.longitude,
+          hasRealLocation: true
         })
         this.loadStations(true)
       },
       fail: () => {
-        // 使用默认位置
         this.setData({
-          latitude: 39.9042,
-          longitude: 116.4074
+          latitude: null,
+          longitude: null,
+          hasRealLocation: false
         })
         this.loadStations(true)
       }
     })
   },
 
-  // 加载站点列表
   loadStations: function(isRefresh = false) {
     if (this.data.isLoading) return
 
@@ -73,14 +74,12 @@ Page({
 
     this.setData({ isLoading: true })
 
-    const { latitude, longitude, page, pageSize } = this.data
+    const { latitude, longitude, hasRealLocation, page, pageSize } = this.data
+    const requestTask = hasRealLocation && latitude != null && longitude != null
+      ? getNearbyStations({ latitude, longitude, radius: 10, limit: 80 })
+      : getStations({ limit: 80 })
 
-    getNearbyStations({
-      latitude,
-      longitude,
-      radius: 10,
-      limit: 80
-    }).then(res => {
+    requestTask.then(res => {
       const payload = res.data || {}
       const newStations = payload.stations || []
       const stations = isRefresh ? newStations : [...this.data.stations, ...newStations]
@@ -126,6 +125,9 @@ Page({
     filtered.sort((a, b) => {
       switch (this.data.sortBy) {
         case 'distance':
+          if (a.distance == null && b.distance == null) return 0
+          if (a.distance == null) return 1
+          if (b.distance == null) return -1
           return a.distance - b.distance
         case 'available':
           return b.available_batteries - a.available_batteries

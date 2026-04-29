@@ -3,9 +3,9 @@
 """
 from datetime import datetime, timedelta
 from flask import g
-from ..models import Order, User, Battery, ExchangeRecord, Payment
+from ..models import Order, User, Battery, ExchangeRecord, Payment, Station
 from .. import db
-from sqlalchemy import func
+from sqlalchemy import func, case
 
 class StatisticsService:
     """数据统计服务类"""
@@ -255,37 +255,65 @@ class StatisticsService:
 
     @staticmethod
     def get_dashboard_summary():
-        """
-        获取仪表板摘要（综合统计）
-
-        Returns:
-            仪表板数据
-        """
         try:
             today = datetime.now().date()
+            this_month = today.replace(day=1)
 
-            # 今日订单
             today_orders = Order.query.filter(
                 Order.created_at >= today,
                 Order.tenant_id == g.tenant_id,
                 Order.is_deleted == False
             ).count()
+            total_orders = Order.query.filter(
+                Order.tenant_id == g.tenant_id,
+                Order.is_deleted == False
+            ).count()
 
-            # 今日营收
             today_revenue = db.session.query(func.sum(Order.total_amount)).filter(
                 Order.status == 'completed',
                 Order.created_at >= today,
                 Order.tenant_id == g.tenant_id,
                 Order.is_deleted == False
             ).scalar() or 0
+            month_revenue = db.session.query(func.sum(Order.total_amount)).filter(
+                Order.status == 'completed',
+                Order.created_at >= this_month,
+                Order.tenant_id == g.tenant_id,
+                Order.is_deleted == False
+            ).scalar() or 0
 
-            # 电池统计
+            station_total = Station.query.filter_by(tenant_id=g.tenant_id, is_deleted=False).count()
+            station_active = Station.query.filter_by(tenant_id=g.tenant_id, status='active', is_deleted=False).count()
+            station_stats = {
+                'total_stations': station_total,
+                'active_stations': station_active,
+                'inactive_stations': max(station_total - station_active, 0)
+            }
+
+            station_usage_rows = db.session.query(
+                Station.name,
+                func.count(Battery.id).label('total'),
+                func.sum(case((Battery.status.in_(['rented', 'in_use', 'charging']), 1), else_=0)).label('busy')
+            ).outerjoin(
+                Battery,
+                (Battery.current_station_id == Station.id) & (Battery.is_deleted == False)
+            ).filter(
+                Station.tenant_id == g.tenant_id,
+                Station.is_deleted == False
+            ).group_by(Station.id, Station.name).all()
+            station_usage = []
+            for row in station_usage_rows:
+                total = int(row.total or 0)
+                busy = int(row.busy or 0)
+                station_usage.append({
+                    'name': row.name,
+                    'usage_rate': round(busy / total * 100, 1) if total else 0
+                })
+            station_usage = sorted(station_usage, key=lambda x: x['usage_rate'], reverse=True)[:5]
+
             battery_stats = StatisticsService.get_battery_statistics()
-
-            # 用户统计
             user_stats = StatisticsService.get_user_statistics()
 
-            # 近7天收入趋势
             revenue_trend = []
             for i in range(6, -1, -1):
                 date = today - timedelta(days=i)
@@ -297,7 +325,6 @@ class StatisticsService:
                 ).scalar() or 0
                 revenue_trend.append(round(float(daily_revenue), 2))
 
-            # 近30天订单趋势
             order_trend = []
             for i in range(29, -1, -1):
                 date = today - timedelta(days=i)
@@ -310,19 +337,26 @@ class StatisticsService:
 
             return {
                 'today_orders': today_orders,
+                'total_orders': total_orders,
                 'today_revenue': round(float(today_revenue), 2),
+                'month_revenue': round(float(month_revenue), 2),
                 'battery_stats': battery_stats,
+                'station_stats': station_stats,
+                'station_usage': station_usage,
                 'user_stats': user_stats,
                 'revenue_trend': revenue_trend,
                 'order_trend': order_trend,
                 'timestamp': datetime.now().isoformat()
             }
-
         except Exception as e:
             return {
                 'today_orders': 0,
+                'total_orders': 0,
                 'today_revenue': 0,
+                'month_revenue': 0,
                 'battery_stats': {},
+                'station_stats': {},
+                'station_usage': [],
                 'user_stats': {},
                 'revenue_trend': [0] * 7,
                 'order_trend': [0] * 30,

@@ -60,6 +60,77 @@ class StationService:
             return False, f"创建站点失败: {str(e)}"
 
     @staticmethod
+    def _format_distance(distance_km):
+        meters = int(round(distance_km * 1000))
+        if meters < 1000:
+            return f'{meters}m'
+        return f'{distance_km:.1f}km'
+
+    @staticmethod
+    def get_station_list(limit=80):
+        try:
+            stations = Station.query.filter(
+                Station.tenant_id == g.tenant_id,
+                Station.is_deleted == False
+            ).order_by(Station.status.asc(), Station.created_at.desc()).limit(limit).all()
+            if not stations:
+                return []
+
+            station_ids = [s.id for s in stations]
+            battery_stats = db.session.query(
+                Battery.current_station_id,
+                Battery.voltage_type,
+                func.count(Battery.id).label('total'),
+                func.sum(case((Battery.status == 'available', 1), else_=0)).label('available')
+            ).filter(
+                Battery.current_station_id.in_(station_ids),
+                Battery.is_deleted == False,
+                Battery.tenant_id == g.tenant_id
+            ).group_by(Battery.current_station_id, Battery.voltage_type).all()
+
+            stats_map = {}
+            for stat in battery_stats:
+                station_id = stat.current_station_id
+                voltage_type = stat.voltage_type or '60V'
+                if station_id not in stats_map:
+                    stats_map[station_id] = {'total': 0, 'available': 0, '60V_total': 0, '60V_available': 0, '72V_total': 0, '72V_available': 0}
+                stats_map[station_id]['total'] += stat.total or 0
+                stats_map[station_id]['available'] += int(stat.available or 0)
+                if voltage_type == '60V':
+                    stats_map[station_id]['60V_total'] = stat.total or 0
+                    stats_map[station_id]['60V_available'] = int(stat.available or 0)
+                elif voltage_type == '72V':
+                    stats_map[station_id]['72V_total'] = stat.total or 0
+                    stats_map[station_id]['72V_available'] = int(stat.available or 0)
+
+            result = []
+            for station in stations:
+                station_data = station.to_dict()
+                stat = stats_map.get(station.id, {'total': 0, 'available': 0, '60V_total': 0, '60V_available': 0, '72V_total': 0, '72V_available': 0})
+                available_count = stat['available']
+                station_data['available_batteries'] = available_count
+                station_data['total_batteries'] = stat['total']
+                station_data['battery_60V'] = {'total': stat['60V_total'], 'available': stat['60V_available']}
+                station_data['battery_72V'] = {'total': stat['72V_total'], 'available': stat['72V_available']}
+                if station.status != 'active':
+                    station_data['health_status'] = 'maintenance'
+                    station_data['health_label'] = '维护中'
+                elif available_count == 0:
+                    station_data['health_status'] = 'empty'
+                    station_data['health_label'] = '暂无电池'
+                elif available_count <= 2:
+                    station_data['health_status'] = 'low'
+                    station_data['health_label'] = '电池紧张'
+                else:
+                    station_data['health_status'] = 'good'
+                    station_data['health_label'] = '电池充足'
+                station_data['recommend_score'] = round(min(available_count / 5, 1) * 0.8 + (1 if station.status == 'active' else 0.25) * 0.2, 3)
+                result.append(station_data)
+            return result
+        except Exception:
+            return []
+
+    @staticmethod
     def get_nearby_stations(latitude, longitude, radius_km=5):
         """
         获取附近站点（增强版：包含可用电池数和健康状态）
@@ -133,6 +204,8 @@ class StationService:
                 )
                 station_data = station.to_dict()
                 station_data['distance'] = round(distance, 2)
+                station_data['distance_meters'] = int(round(distance * 1000))
+                station_data['distance_text'] = StationService._format_distance(distance)
 
                 # 电池统计
                 stat = stats_map.get(station.id, {

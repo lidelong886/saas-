@@ -11,6 +11,20 @@ from ..utils.validators import validate_positive_number
 
 station_bp = Blueprint('station', __name__)
 
+@station_bp.route('/public-list', methods=['GET'])
+@jwt_required(optional=True)
+def get_public_station_list():
+    """获取站点列表（无定位时不返回距离）"""
+    try:
+        limit = request.args.get('limit', 80, type=int)
+        stations = StationService.get_station_list(limit)
+        return success_response({
+            'stations': stations,
+            'total': len(stations)
+        }, '获取站点列表成功')
+    except Exception as e:
+        return error_response(f'获取站点列表失败: {str(e)}', 500)
+
 @station_bp.route('/nearby', methods=['GET'])
 @jwt_required(optional=True)
 def get_nearby_stations():
